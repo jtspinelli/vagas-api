@@ -1,10 +1,21 @@
+import { AutoMap } from '@automapper/classes';
+
 export class User {
-	constructor(
-		private uuid: string,
-		private name: string,
-		private email: string,
-		private senha: string,
-		private nomeEmpresa: string,
-		private tipo: 'candidato' | 'admin' | 'recrutador'
-	){	}
+	@AutoMap()
+	private uuid: string;
+
+	@AutoMap()
+	private name: string;
+
+	@AutoMap()
+	private email: string;
+
+	@AutoMap()
+	private senha: string;
+
+	@AutoMap()
+	private nomeEmpresa: string;
+
+	@AutoMap()
+	private tipo: 'candidato' | 'admin' | 'recrutador';
 }
