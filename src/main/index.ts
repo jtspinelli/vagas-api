@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import db from './config/dataSource';
 import mapper from '../app/helpers/mapper';
-import { UserToCreateDTO } from '../app/features/user/usecases/createUser/createUserUsecase';
+import { UserToCreateDTO } from '../app/features/user/usecases/createUser/UserToCreateDTO';
 import { registerRoutes } from './config/httpRoutes.config';
 import { UserEntity } from '../app/shared/database/entities/user.entity';
 import { createMap } from '@automapper/core';
