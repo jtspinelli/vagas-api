@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { createUserController } from './controller';
-import { validatePostUser } from './validators';
+import { validateCreateUser } from './validators';
 
 const userRouter = Router();
 
-userRouter.post('/', validatePostUser, createUserController);
+userRouter.post('/', validateCreateUser, createUserController);
 
 export { userRouter };

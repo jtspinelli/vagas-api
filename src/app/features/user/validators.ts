@@ -1,26 +1,38 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import { UserRepository } from './repository';
 import { badRequest, unauthorized } from '../../helpers/httpResponses';
 
-export const validatePostUser = async (req: Request, res: Response, next: NextFunction) => {
+function isValidString(value: any) {
+	return typeof value == 'string' && value.trim().length > 0;
+}
+
+function isValidTipo(value: any) {
+	return ['candidato', 'admin', 'recrutador'].includes(value);
+}
+
+function isValidNomeEmpresa(value: any) {
+	return ['undefined', 'string'].includes(typeof value);
+}
+
+export const validateCreateUser = async (req: Request, res: Response, next: NextFunction) => {
 	const { name, email, senha, tipo, nomeEmpresa } = req.body;
+	let message;
 
-	if(typeof name !== 'string' || !name.trim().length) {
-		return badRequest(res, typeof name !== 'string' ? 'Nome inválido ou ausente' : 'Nome não pode estar em branco');
+	const invalidField = [
+		{name: 'Name', value: name}, 
+		{name: 'Email', value: email}, 
+		{name: 'Senha', value: senha}
+	].find(field => !isValidString(field.value));
+
+	if(invalidField) {
+		message = invalidField.name + (typeof invalidField.name !== 'string' ?  ' inválido ou ausente' : ' não pode estar em branco');
+		return badRequest(res, message);
 	}
 
-	if(typeof senha !== 'string' || !senha.trim().length) {
-		return badRequest(res, typeof senha !== 'string' ? 'Senha inválida ou ausente' : 'Senha não pode estar em branco');
-	}
+	if (!isValidTipo(tipo)) return badRequest(res, 'Tipo inválido');
 
-	if (tipo !== 'candidato' &&
-		tipo !== 'admin' &&
-		tipo !== 'recrutador'
-	) {
-		return badRequest(res, 'Tipo inválido');
-	}
-
-	if(!['undefined', 'string'].includes(typeof nomeEmpresa)) return badRequest(res, 'nomeEmpresa inválido');
+	if(!isValidNomeEmpresa(nomeEmpresa)) return badRequest(res, 'nomeEmpresa inválido');
 
 	const userRepository = new UserRepository();
 	const anotherUserWithThisEmail = await userRepository.findByEmail(email) !== null;
