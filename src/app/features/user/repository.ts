@@ -1,7 +1,6 @@
 import { UserToCreateDTO } from './usecases/createUser/UserToCreateDTO';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../../shared/database/entities/user.entity';
-import { User } from '../../models/user';
 import db from '../../../main/config/dataSource';
 import mapper from '../../helpers/mapper';
 
@@ -12,10 +11,12 @@ export class UserRepository {
 		this.userRepository = db.getRepository(UserEntity);
 	}
 
-	async create(userToCreate: UserToCreateDTO): Promise<User> {
-		const createdUser = await this.userRepository.save(mapper.map(userToCreate, UserToCreateDTO, UserEntity));
+	async getAll() {
+		return await this.userRepository.find();
+	}
 
-		return mapper.map(createdUser, UserEntity, User);
+	async create(userToCreate: UserEntity): Promise<UserEntity> {
+		return await this.userRepository.save(userToCreate);
 	}
 
 	async findByEmail(email: string) {

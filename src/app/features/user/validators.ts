@@ -2,13 +2,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { UserRepository } from './repository';
 import { badRequest, unauthorized } from '../../helpers/httpResponses';
+import { UserTipo } from './enums/userTipo';
 
 function isValidString(value: any) {
 	return typeof value == 'string' && value.trim().length > 0;
 }
 
 function isValidTipo(value: any) {
-	return ['candidato', 'admin', 'recrutador'].includes(value);
+	return Object.values(UserTipo).includes(value);
 }
 
 function isValidNomeEmpresa(value: any) {
@@ -26,7 +27,7 @@ export const validateCreateUser = async (req: Request, res: Response, next: Next
 	].find(field => !isValidString(field.value));
 
 	if(invalidField) {
-		message = invalidField.name + (typeof invalidField.name !== 'string' ?  ' inválido ou ausente' : ' não pode estar em branco');
+		message = invalidField.name + (typeof invalidField.value !== 'string' ? ' inválido ou ausente' : ' não pode estar em branco');
 		return badRequest(res, message);
 	}
 

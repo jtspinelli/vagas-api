@@ -1,8 +1,15 @@
 import { AutoMap } from '@automapper/classes';
+import { UserTipo } from '../features/user/enums/userTipo';
 
 export class User {
 	@AutoMap()
 	private uuid: string;
+
+	@AutoMap()
+	private createdAt: Date;
+
+	@AutoMap()
+	private updatedAt: Date;
 
 	@AutoMap()
 	private name: string;
@@ -13,9 +20,16 @@ export class User {
 	@AutoMap()
 	private senha: string;
 
-	@AutoMap()
-	private nomeEmpresa: string;
+	// @AutoMap()
+	// private nomeEmpresa: string;
+	
+	private _tipo: UserTipo;
 
-	@AutoMap()
-	private tipo: 'candidato' | 'admin' | 'recrutador';
+	public get tipo(){
+		return this._tipo;
+	}
+
+	public set tipo(value:UserTipo) {
+		this._tipo = value;
+	}
 }

@@ -17,11 +17,10 @@ export class UserEntity extends BaseEntity {
 	@AutoMap()
 	senha: string;
 	
-	@Column({ name: 'nome_empresa' })
+	@Column({ name: 'nome_empresa', nullable: true })
 	@AutoMap()
 	nomeEmpresa: string;
 
 	@Column()
-	@AutoMap()
 	tipo: string;	
 }

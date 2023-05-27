@@ -1,7 +1,12 @@
-import 'dotenv/config';
+// import 'dotenv/config';
+import dotenv from 'dotenv';
+import { VagaCandidatoEntity } from './../../app/shared/database/entities/vagaCandidato.entity';
 import { DataSourceOptions } from 'typeorm';
 import { UserEntity } from '../../app/shared/database/entities/user.entity';
-import { CreateUsersTable1684975171579 } from '../../app/shared/database/migrations/1684975171579-CreateUsersTable';
+import { VagaEntity } from '../../app/shared/database/entities/vaga.entity';
+import { GenerateDb1685063138896 } from '../../app/shared/database/migrations/1685063138896-GenerateDb';
+
+dotenv.config();
 
 const typeormconfig: DataSourceOptions = {
 	type: 'postgres',
@@ -10,8 +15,8 @@ const typeormconfig: DataSourceOptions = {
 		rejectUnauthorized: false,
 	},
 	synchronize: false,
-	entities: [UserEntity],
-	migrations: [CreateUsersTable1684975171579]
+	entities: [UserEntity, VagaEntity, VagaCandidatoEntity],
+	migrations: [GenerateDb1685063138896]
 };
 
 export default typeormconfig;
