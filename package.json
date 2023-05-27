@@ -6,7 +6,10 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node out/main/index.js",
-    "dev": "nodemon src/main/index.ts"
+    "dev": "nodemon src/main/index.ts",
+	"typeorm": "typeorm-ts-node-commonjs",
+	"migration:g": "npm run typeorm migration:generate -- src/app/shared/database/migrations/GenerateDb -d src/main/config/dataSource.ts",
+	"migration:r": "npm run typeorm -- migration:run -d src/main/config/dataSource.ts"
   },
   "author": "",
   "license": "ISC",
