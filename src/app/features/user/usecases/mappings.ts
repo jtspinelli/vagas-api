@@ -13,10 +13,10 @@ function getTipo(value: string){
 }
 
 const registerUserMappings = () => {
-	createMap(mapper, UserToCreateDTO, UserEntity, forMember(u => u.tipo, mapFrom(s => getTipo(s.tipo))));
-	createMap(mapper, UserEntity, User, forMember(u => u.tipo, mapFrom(s => getTipo(s.tipo))));
-	createMap(mapper, UserEntity, UserDTO, forMember(u => u.tipo, mapFrom(s => getTipo(s.tipo))));
-	createMap(mapper, UserEntity, RecrutadorUserDTO, forMember(u => u.tipo, mapFrom(s => getTipo(s.tipo))));
+	createMap(mapper, UserToCreateDTO, UserEntity, forMember(entity => entity.tipo, mapFrom(dto => getTipo(dto.tipo))));
+	createMap(mapper, UserEntity, User, forMember(model => model.tipo, mapFrom(entity => getTipo(entity.tipo))));
+	createMap(mapper, UserEntity, UserDTO, forMember(dto => dto.tipo, mapFrom(entity => getTipo(entity.tipo))));
+	createMap(mapper, UserEntity, RecrutadorUserDTO, forMember(dto => dto.tipo, mapFrom(entity => getTipo(entity.tipo))));
 };
 
 export default registerUserMappings;
