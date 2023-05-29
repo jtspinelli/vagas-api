@@ -16,7 +16,7 @@ export class UserRepository {
 	}
 
 	async getAll(queryParams: any): Promise<Page<UserDTO | RecrutadorUserDTO>> {
-		const { name } = queryParams;
+		const { name, tipo } = queryParams;
 		const page = Number(queryParams.page) || 1;
 		const limit = Number(queryParams.limit || appEnv.paginationLimit);
 
@@ -26,6 +26,10 @@ export class UserRepository {
 
 		if(name){
 			query.where('lower(userEntity.name) like :name', {name: `%${name}%`});
+		}
+
+		if(tipo){
+			query.where('lower(userEntity.tipo) = :tipo', {tipo: (tipo as string).toLowerCase()});
 		}
 		
 		query.skip(page * limit - limit);

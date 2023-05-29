@@ -8,8 +8,8 @@ function isValidString(value: any) {
 	return typeof value == 'string' && value.trim().length > 0;
 }
 
-function isValidTipo(value: any) {
-	return Object.values(UserTipo).includes(value);
+function isValidTipo(value: string) {
+	return Object.values(UserTipo).map(userTipo => userTipo.toLowerCase()).includes(value.toLowerCase());
 }
 
 function isValidNomeEmpresa(value: any) {
@@ -24,6 +24,11 @@ export const checkGetUsersQueryParams = (req: Request, res: Response, next: Next
 	if(req.query.page && isNaN(Number(req.query.page))){
 		return res.status(400).send('Propriedade page inválida.');
 	}
+
+	if(req.query.tipo && !isValidTipo(req.query.tipo as string)){
+		return res.status(400).send('Propriedade tipo inválida.');
+	}
+
 	next();
 };
 
