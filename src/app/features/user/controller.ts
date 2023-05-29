@@ -2,9 +2,6 @@ import { UserRepository } from './repository';
 import { Request, Response } from 'express';
 import { CreateUserUsecase } from './usecases/createUser/createUserUsecase';
 import { GetUsersUsecase } from './usecases/getUsers/getUsersUsecase';
-import { UserEntity } from '../../shared/database/entities/user.entity';
-import db from '../../../main/config/dataSource';
-import { appEnv } from '../../env/appEnv';
 
 export const createUserController = async (req: Request, res: Response) => {	
 	const userData = req.body;
