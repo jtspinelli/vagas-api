@@ -16,6 +16,17 @@ function isValidNomeEmpresa(value: any) {
 	return ['undefined', 'string'].includes(typeof value);
 }
 
+export const checkGetUsersQueryParams = (req: Request, res: Response, next: NextFunction) => {
+	if(req.query.limit && (isNaN(Number(req.query.limit)) || Number(req.query.limit) > 10)){
+		return res.status(400).send('Propriedade limit inválida.');
+	}
+
+	if(req.query.page && isNaN(Number(req.query.page))){
+		return res.status(400).send('Propriedade page inválida.');
+	}
+	next();
+};
+
 export const validateCreateUser = async (req: Request, res: Response, next: NextFunction) => {
 	const { name, email, senha, tipo, nomeEmpresa } = req.body;
 	let message;

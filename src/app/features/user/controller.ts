@@ -2,6 +2,9 @@ import { UserRepository } from './repository';
 import { Request, Response } from 'express';
 import { CreateUserUsecase } from './usecases/createUser/createUserUsecase';
 import { GetUsersUsecase } from './usecases/getUsers/getUsersUsecase';
+import { UserEntity } from '../../shared/database/entities/user.entity';
+import db from '../../../main/config/dataSource';
+import { appEnv } from '../../env/appEnv';
 
 export const createUserController = async (req: Request, res: Response) => {	
 	const userData = req.body;
@@ -13,10 +16,10 @@ export const createUserController = async (req: Request, res: Response) => {
 	return res.status(201).send(createdUser);
 };
 
-export const getUsersController = async (_: Request, res: Response) => {
+export const getUsersController = async (req: Request, res: Response) => {
 	const userRepository = new UserRepository();
 	const getUsersUsecase = new GetUsersUsecase(userRepository);
-	const users = await getUsersUsecase.execute();
+	const users = await getUsersUsecase.execute(req.query);	
 
 	return res.status(200).send(users);
 };

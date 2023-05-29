@@ -1,8 +1,12 @@
-import { UserToCreateDTO } from './usecases/createUser/UserToCreateDTO';
-import { Repository } from 'typeorm';
-import { UserEntity } from '../../shared/database/entities/user.entity';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import db from '../../../main/config/dataSource';
 import mapper from '../../helpers/mapper';
+import { UserEntity } from '../../shared/database/entities/user.entity';
+import { Repository } from 'typeorm';
+import { appEnv } from '../../env/appEnv';
+import { Page } from '../../helpers/Page';
+import { RecrutadorUserDTO } from './usecases/getUsers/RecrutadorUserDTO';
+import { UserDTO } from './usecases/getUsers/UserDTO';
 
 export class UserRepository {
 	private userRepository: Repository<UserEntity>;
@@ -11,8 +15,36 @@ export class UserRepository {
 		this.userRepository = db.getRepository(UserEntity);
 	}
 
-	async getAll() {
-		return await this.userRepository.find();
+	async getAll(queryParams: any): Promise<Page<UserDTO | RecrutadorUserDTO>> {
+		const { name } = queryParams;
+		const page = Number(queryParams.page) || 1;
+		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+
+		const query = this.userRepository
+			.createQueryBuilder('userEntity')
+			.orderBy('userEntity.createdAt', 'DESC');
+
+		if(name){
+			query.where('lower(userEntity.name) like :name', {name: `%${name}%`});
+		}
+		
+		query.skip(page * limit - limit);
+		query.take(limit);
+
+		const totalPages = Math.ceil(await query.getCount() / limit);
+		const count = await query.getCount();	
+		const users = (await query.getMany()).map(user => {
+			return user.nomeEmpresa === null
+				? mapper.map(user, UserEntity, UserDTO)
+				: mapper.map(user, UserEntity, RecrutadorUserDTO);
+		});
+
+		return new Page<UserDTO | RecrutadorUserDTO>(
+			page,
+			totalPages,
+			count,
+			users
+		);
 	}
 
 	async create(userToCreate: UserEntity): Promise<UserEntity> {
