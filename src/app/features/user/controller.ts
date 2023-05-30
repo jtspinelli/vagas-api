@@ -1,16 +1,24 @@
-import { UserRepository } from './repository';
 import { Request, Response } from 'express';
 import { CreateUserUsecase } from './usecases/createUser/createUserUsecase';
 import { GetUsersUsecase } from './usecases/getUsers/getUsersUsecase';
+import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
+import { UserRepository } from './repository';
 
-export const createUserController = async (req: Request, res: Response) => {	
-	const userData = req.body;
-	
-	const userRepository = new UserRepository();
-	const createUserUsecase = new CreateUserUsecase(userRepository);
-	const createdUser = await createUserUsecase.execute(userData);
-
-	return res.status(201).send(createdUser);
+export const createUserController = async (req: Request, res: Response) => {
+	try {
+		const userData = req.body;
+		
+		const userRepository = new UserRepository();
+		const createUserUsecase = new CreateUserUsecase(userRepository);
+		const createdUser = await createUserUsecase.execute(userData, req.body.authenticatedUser);
+		
+		return res.status(201).send(createdUser);
+	} catch(error) {
+		if(error instanceof ForbiddenError){
+			return error.respond(res);
+		}
+		return res.status(500).send({});
+	}	
 };
 
 export const getUsersController = async (req: Request, res: Response) => {

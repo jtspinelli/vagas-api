@@ -55,6 +55,10 @@ export class UserRepository {
 		return await this.userRepository.save(userToCreate);
 	}
 
+	async findByUuid(uuid: string) {
+		return await this.userRepository.findOneBy({uuid});
+	}
+
 	async findByEmail(email: string) {
 		return await this.userRepository.findOneBy({email});
 	}
