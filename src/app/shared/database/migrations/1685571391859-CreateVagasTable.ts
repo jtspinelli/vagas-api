@@ -9,6 +9,7 @@ export class CreateVagasTable1685571391859 implements MigrationInterface {
 				columns: [
 					new TableColumn({ name: 'uuid', type: 'varchar', isPrimary: true }),
 					new TableColumn({ name: 'created_at', type: 'varchar' }),
+					new TableColumn({ name: 'updated_at', type: 'varchar' }),
 					new TableColumn({ name: 'recrutador_uuid', type: 'varchar' }),
 					new TableColumn({ name: 'descricao', type: 'varchar' }),
 					new TableColumn({ name: 'nome_empresa', type: 'varchar' }),
