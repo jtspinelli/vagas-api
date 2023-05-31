@@ -8,11 +8,14 @@ export class VagaEntity extends BaseEntity {
 	@Column()
 	descricao: string;
 
-	@Column({ name: 'empresa_nome' })
-	empresaNome: string;
+	@Column({ name: 'recrutador_uuid' })
+	recrutadorUuid: string;
 
-	@Column()
-	dataLimite: Date;
+	@Column({ name: 'nome_empresa' })
+	nomeEmpresa: string;
+
+	@Column({ name: 'data_limite' })
+	dataLimite: string;
 
 	@Column()
 	ativo: boolean;
@@ -20,7 +23,7 @@ export class VagaEntity extends BaseEntity {
 	@Column({ name: 'max_candidatos' })
 	maxCandidatos: number;
 
-	@ManyToOne(() => UserEntity)
-	@JoinColumn({ name: 'recrutador_uuid' })
-	recrutador: UserEntity;	
+	// @ManyToOne(() => UserEntity)
+	// @JoinColumn({ name: 'recrutador_uuid' })
+	// recrutador: UserEntity;	
 }
