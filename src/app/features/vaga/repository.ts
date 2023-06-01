@@ -2,6 +2,10 @@
 import db from '../../../main/config/dataSource';
 import { Repository } from 'typeorm';
 import { VagaEntity } from '../../shared/database/entities/vaga.entity';
+import { appEnv } from '../../env/appEnv';
+import { VagaDTO } from './usecases/getVagasUsecase/VagaDTO';
+import { Page } from '../../helpers/Page';
+import mapper from '../../helpers/mapper';
 
 export class VagaRepository {
 	private vagaRepository: Repository<VagaEntity>;
@@ -10,8 +14,29 @@ export class VagaRepository {
 		this.vagaRepository = db.getRepository(VagaEntity);
 	}
 
-	listAllVagas(): Promise<VagaEntity[]> {
-		return this.vagaRepository.find();
+	async getAll(queryParams: any): Promise<Page<VagaDTO>> {
+		const { descricao } = queryParams;
+		const page = Number(queryParams.page) || 1;
+		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+
+		const query = this.vagaRepository
+			.createQueryBuilder('vagaEntity')
+			.orderBy('vagaEntity.createdAt', 'DESC');
+
+		if(descricao){
+			query.where('lower(vagaEntity.descricao) like :descricao', {descricao: `%${descricao}%`});
+		}
+
+		query.skip(page * limit - limit);
+		query.take(limit);
+
+		const totalPages = Math.ceil(await query.getCount() / limit);
+		const count = await query.getCount();
+		const vagas = (await query.getMany()).map(vaga => mapper.map(vaga, VagaEntity, VagaDTO));
+
+		return new Page<VagaDTO>(
+			page, totalPages, count, vagas
+		);
 	}
 
 	async create(vagaToCreate: VagaEntity) {		
