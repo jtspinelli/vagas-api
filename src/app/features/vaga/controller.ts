@@ -4,10 +4,10 @@ import { VagaRepository } from './repository';
 import { CreateVagaUsecase } from './usecases/createVagaUsecase/createVagaUsecase';
 import { handleControllerError } from '../../shared/exceptions';
 
-export const listVagasController = async (_: Request, res: Response) => {
+export const listVagasController = async (req: Request, res: Response) => {
 	try {
 		const repository = new VagaRepository();
-		const vagas = await repository.listAllVagas();
+		const vagas = await repository.getAll(req.query);
 
 		res.status(200).send(vagas);
 	} catch (error) {
@@ -24,6 +24,6 @@ export const createVagaController = async (req: Request, res: Response) => {
 
 		return res.send(createdVaga);
 	} catch (error: any) {
-		handleControllerError(error, res);		
+		handleControllerError(error, res);
 	}
 };

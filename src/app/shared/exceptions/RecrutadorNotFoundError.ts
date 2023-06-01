@@ -1,8 +1,8 @@
 import { Response } from 'express';
 
-export class RecrutadorNotFoundError extends Error {
+export class RecrutadorRequiredError extends Error {
 	constructor() {
-		super('Recrutador não encontrado.');
+		super('Apenas Recrutadores tem permissão para esta ação.');
 	}
 
 	respond(res: Response) {
