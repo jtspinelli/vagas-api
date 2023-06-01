@@ -25,7 +25,8 @@ export class LoginUsecase {
 			sub: user.uuid,
 			name: user.name,
 			email: user.email,
-			isAdmin: user.tipo === UserTipo.Admin
+			isAdmin: user.tipo === UserTipo.Admin,
+			isRecrutador: user.tipo === UserTipo.Recrutador
 		}, appEnv.jwtSecret as string, {algorithm: 'HS256'});
 	}
 }

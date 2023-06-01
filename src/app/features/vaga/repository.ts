@@ -13,4 +13,8 @@ export class VagaRepository {
 	listAllVagas(): Promise<VagaEntity[]> {
 		return this.vagaRepository.find();
 	}
+
+	async create(vagaToCreate: VagaEntity) {		
+		return this.vagaRepository.save(vagaToCreate);
+	}
 }
