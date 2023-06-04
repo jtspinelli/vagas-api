@@ -14,6 +14,10 @@ export class VagaRepository {
 		this.vagaRepository = db.getRepository(VagaEntity);
 	}
 
+	async get(uuid: string) {
+		return this.vagaRepository.findOneBy({uuid});
+	}
+
 	async getAll(queryParams: any): Promise<Page<VagaDTO>> {
 		const { descricao } = queryParams;
 		const page = Number(queryParams.page) || 1;
