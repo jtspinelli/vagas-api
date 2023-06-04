@@ -14,6 +14,10 @@ export class CreateUserUsecase {
 		if(userToCreate.tipo === 'Recrutador' && !authenticatedUser.isAdmin){
 			throw new ForbiddenError('Apenas usuário Admin pode criar Recrutadores.');
 		}
+
+		if(userToCreate.tipo === 'Admin' && !authenticatedUser.isAdmin){
+			throw new ForbiddenError('Apenas usuário Admin pode criar outro Admin');
+		}
 		
 		const newUser = mapper.map(userToCreate, UserToCreateDTO, UserEntity);
 		newUser.senha = await bcrypt.hash(newUser.senha, 10);

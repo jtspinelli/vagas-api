@@ -7,6 +7,7 @@ import { appEnv } from '../../env/appEnv';
 import { Page } from '../../helpers/Page';
 import { RecrutadorUserDTO } from './usecases/getUsers/RecrutadorUserDTO';
 import { UserDTO } from './usecases/getUsers/UserDTO';
+import { Request } from 'express';
 
 export class UserRepository {
 	private userRepository: Repository<UserEntity>;
@@ -15,10 +16,10 @@ export class UserRepository {
 		this.userRepository = db.getRepository(UserEntity);
 	}
 
-	async getAll(queryParams: any): Promise<Page<UserDTO | RecrutadorUserDTO>> {
-		const { name, tipo } = queryParams;
-		const page = Number(queryParams.page) || 1;
-		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+	async getAll(req: Request): Promise<Page<UserDTO | RecrutadorUserDTO>> {
+		const { name, tipo } = req.query;
+		const page = Number(req.query.page) || 1;
+		const limit = Number(req.query.limit || appEnv.paginationLimit);
 
 		const query = this.userRepository
 			.createQueryBuilder('userEntity')
@@ -30,6 +31,14 @@ export class UserRepository {
 
 		if(tipo){
 			query.where('lower(userEntity.tipo) = :tipo', {tipo: (tipo as string).toLowerCase()});
+		}
+
+		if(req.body.authenticatedUser.isCandidato) {
+			query.where('lower(userEntity.tipo) = :tipo', {tipo: 'candidato'});
+		}
+
+		if(req.body.authenticatedUser.isRecrutador) {
+			query.where('lower(userEntity.tipo) = :tipo', {tipo: 'recrutador'});
 		}
 		
 		query.skip(page * limit - limit);

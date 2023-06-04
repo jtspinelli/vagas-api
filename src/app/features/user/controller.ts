@@ -24,7 +24,7 @@ export const createUserController = async (req: Request, res: Response) => {
 export const getUsersController = async (req: Request, res: Response) => {
 	const userRepository = new UserRepository();
 	const getUsersUsecase = new GetUsersUsecase(userRepository);
-	const users = await getUsersUsecase.execute(req.query);	
+	const users = await getUsersUsecase.execute(req);	
 
 	return res.status(200).send(users);
 };
