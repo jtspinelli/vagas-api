@@ -3,6 +3,8 @@ import { NextFunction, Request, Response } from 'express';
 import { UserRepository } from './repository';
 import { badRequest, unauthorized } from '../../helpers/httpResponses';
 import { UserTipo } from './enums/userTipo';
+import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
+import { handleError } from '../../shared/exceptions';
 
 function isValidString(value: any) {
 	return typeof value == 'string' && value.trim().length > 0;
@@ -33,27 +35,39 @@ export const checkGetUsersQueryParams = (req: Request, res: Response, next: Next
 };
 
 export const validateCreateUser = async (req: Request, res: Response, next: NextFunction) => {
-	const { name, email, senha, tipo, nomeEmpresa } = req.body;
-	let message;
+	try {
+		const { name, email, senha, tipo, nomeEmpresa } = req.body;
+		let message;
+		
+		const invalidField = [
+			{name: 'Name', value: name}, 
+			{name: 'Email', value: email}, 
+			{name: 'Senha', value: senha}
+		].find(field => !isValidString(field.value));
 
-	const invalidField = [
-		{name: 'Name', value: name}, 
-		{name: 'Email', value: email}, 
-		{name: 'Senha', value: senha}
-	].find(field => !isValidString(field.value));
+		if(invalidField) {
+			message = invalidField.name + (typeof invalidField.value !== 'string' ? ' inválido ou ausente' : ' não pode estar em branco');
+			return badRequest(res, message);
+		}
 
-	if(invalidField) {
-		message = invalidField.name + (typeof invalidField.value !== 'string' ? ' inválido ou ausente' : ' não pode estar em branco');
-		return badRequest(res, message);
+		if (!isValidTipo(tipo)) return badRequest(res, 'Tipo inválido');
+	
+		if(!isValidNomeEmpresa(nomeEmpresa)) return badRequest(res, 'nomeEmpresa inválido');
+	
+		const userRepository = new UserRepository();
+		const anotherUserWithThisEmail = await userRepository.findByEmail(email) !== null;
+		if(anotherUserWithThisEmail) return unauthorized(res, 'Email indiponível');
+	
+		if(req.body.tipo === 'Recrutador' && !req.body.authenticatedUser.isAdmin){
+			throw new ForbiddenError('Apenas usuário Admin pode criar Recrutadores.');
+		}
+
+		if(req.body.tipo === 'Admin' && !req.body.authenticatedUser.isAdmin){
+			throw new ForbiddenError('Apenas usuário Admin pode criar outro Admin');
+		}
+	
+		next();
+	} catch (error: any) {
+		handleError(error, res);
 	}
-
-	if (!isValidTipo(tipo)) return badRequest(res, 'Tipo inválido');
-
-	if(!isValidNomeEmpresa(nomeEmpresa)) return badRequest(res, 'nomeEmpresa inválido');
-
-	const userRepository = new UserRepository();
-	const anotherUserWithThisEmail = await userRepository.findByEmail(email) !== null;
-	if(anotherUserWithThisEmail) return unauthorized(res, 'Email indiponível');	
-
-	next();
 };

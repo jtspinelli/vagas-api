@@ -1,9 +1,11 @@
 import { Response } from 'express';
 import { RecrutadorRequiredError } from './RecrutadorNotFoundError';
 import { QueryFailedError } from 'typeorm';
+import { CandidatoOnlyError } from './CandidatoOnlyError';
+import { ForbiddenError } from './ForbiddenError';
 
-export function handleControllerError(error: Error, res: Response) {
-	if(error instanceof RecrutadorRequiredError){
+export function handleError(error: Error, res: Response) {
+	if(error instanceof ForbiddenError || error instanceof RecrutadorRequiredError || error instanceof CandidatoOnlyError){
 		return error.respond(res);
 	}
 
