@@ -5,7 +5,6 @@ import { VagaEntity } from '../../shared/database/entities/vaga.entity';
 import { appEnv } from '../../env/appEnv';
 import { VagaDTO } from './usecases/getVagasUsecase/VagaDTO';
 import { Page } from '../../helpers/Page';
-import mapper from '../../helpers/mapper';
 
 export class VagaRepository {
 	private vagaRepository: Repository<VagaEntity>;
@@ -25,7 +24,7 @@ export class VagaRepository {
 
 		const query = this.vagaRepository
 			.createQueryBuilder('vagaEntity')
-			.orderBy('vagaEntity.createdAt', 'DESC');
+			.orderBy('vagaEntity.criadoEm', 'DESC');
 
 		if(descricao){
 			query.where('lower(vagaEntity.descricao) like :descricao', {descricao: `%${descricao}%`});
@@ -36,7 +35,7 @@ export class VagaRepository {
 
 		const totalPages = Math.ceil(await query.getCount() / limit);
 		const count = await query.getCount();
-		const vagas = (await query.getMany()).map(vaga => mapper.map(vaga, VagaEntity, VagaDTO));
+		const vagas = (await query.getMany()).map(vaga =>vaga.toJson());
 
 		return new Page<VagaDTO>(
 			page, totalPages, count, vagas

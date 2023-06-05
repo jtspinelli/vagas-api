@@ -44,10 +44,7 @@ export const validateApplyToVaga = async (req: Request, res: Response, next: Nex
 		const vaga = await vagaRepository.get(req.params.vaga_id);
 
 		if(!vaga) throw new VagaNotFoundError();
-
-		if(new Date(vaga.dataLimite) < new Date()) {
-			throw new VagaExpiredError();
-		}
+		if(!vaga.ativa) throw new VagaExpiredError();
 
 		next();
 	} catch (error:any) {

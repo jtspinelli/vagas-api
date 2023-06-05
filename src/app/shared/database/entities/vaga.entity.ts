@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BaseEntity } from './base.entity';
 import { AutoMap } from '@automapper/classes';
+import { VagaDTO } from '../../../features/vaga/usecases/getVagasUsecase/VagaDTO';
 
 @Entity('vagas')
 export class VagaEntity extends BaseEntity {
@@ -22,13 +23,25 @@ export class VagaEntity extends BaseEntity {
 	@AutoMap()
 	dataLimite: string;
 
-	@Column()
-	@AutoMap()
-	ativo: boolean;
-
 	@Column({ name: 'max_candidatos' })
 	@AutoMap()
 	maxCandidatos: number;
+
+	public get ativa() {
+		return new Date(this.dataLimite) > new Date();
+	}
+
+	public toJson(): VagaDTO {
+		return {
+			id: this.uuid,
+			criadaEm: this.criadoEm,
+			dataLimite: this.dataLimite,
+			maxCandidatos: this.maxCandidatos,
+			nomeEmpresa: this.nomeEmpresa,
+			idRecrutador: this.recrutadorUuid,
+			ativa: this.ativa
+		};
+	}
 
 	// @ManyToOne(() => UserEntity)
 	// @JoinColumn({ name: 'recrutador_uuid' })
