@@ -1,12 +1,14 @@
 import { Response } from 'express';
 import { RecrutadorRequiredError } from './RecrutadorRequiredError';
 import { QueryFailedError } from 'typeorm';
-import { CandidatoOnlyError } from './CandidatoOnlyError';
 import { ForbiddenError } from './ForbiddenError';
 import { VagaNotFoundError } from './VagaNotFoundError';
 import { VagaExpiredError } from './VagaExpiredError';
 import { RecrutadorNotFoundError } from './RecrutadorNotFoundError';
 import { CandidatoNotFoundError } from './CandidatoNotFoundError';
+import { CandidatoOnlyError } from './CandidatoOnlyError';
+import { CandidatoAlreadyAppliedError } from './CandidateAlreadyAppliedError';
+import { MaxCandidaturasReachedError } from './MaxCandidaturasReachedError';
 
 export function handleError(error: Error, res: Response) {
 	if(error instanceof ForbiddenError 
@@ -15,7 +17,9 @@ export function handleError(error: Error, res: Response) {
 		|| error instanceof RecrutadorRequiredError 
 		|| error instanceof CandidatoOnlyError
 		|| error instanceof RecrutadorNotFoundError
-		|| error instanceof CandidatoNotFoundError){
+		|| error instanceof CandidatoNotFoundError
+		|| error instanceof CandidatoAlreadyAppliedError
+		|| error instanceof MaxCandidaturasReachedError){
 		return error.respond(res);
 	}
 

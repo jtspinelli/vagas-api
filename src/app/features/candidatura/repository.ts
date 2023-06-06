@@ -13,6 +13,22 @@ export class CandidaturaRepository {
 		return await this.candidaturaRepository.find();
 	}
 
+	async getByCandidato(candidatoUuid: string) {
+		return await this.candidaturaRepository.createQueryBuilder('candidatura')
+			.leftJoinAndSelect('candidatura.candidato', 'candidato')
+			.leftJoinAndSelect('candidatura.vaga', 'vaga')
+			.where('candidatura.candidato_uuid = :candidatoUuid', {candidatoUuid})
+			.getMany();
+	}
+
+	async getByVaga(vagaUuid: string) {
+		return await this.candidaturaRepository.createQueryBuilder('candidatura')
+			.leftJoinAndSelect('candidatura.candidato', 'candidato')
+			.leftJoinAndSelect('candidatura.vaga', 'vaga')
+			.where('candidatura.vaga_uuid = :vagaUuid', {vagaUuid})
+			.getMany();
+	}
+
 	async save(candidatura: CandidaturaEntity) {
 		return await this.candidaturaRepository.save(candidatura);
 	} 

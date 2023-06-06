@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from 'express';
+import { CandidatoAlreadyAppliedError } from '../../shared/exceptions/CandidateAlreadyAppliedError';
 import { CandidatoNotFoundError } from '../../shared/exceptions/CandidatoNotFoundError';
+import { CandidaturaRepository } from './repository';
 import { CandidatoOnlyError } from '../../shared/exceptions/CandidatoOnlyError';
 import { VagaNotFoundError } from '../../shared/exceptions/VagaNotFoundError';
 import { VagaExpiredError } from '../../shared/exceptions/VagaExpiredError';
@@ -8,9 +10,11 @@ import { VagaRepository } from '../vaga/repository';
 import { handleError } from '../../shared/exceptions';
 import { UserEntity } from '../../shared/database/entities/user.entity';
 import db from '../../../main/config/dataSource';
+import { MaxCandidaturasReachedError } from '../../shared/exceptions/MaxCandidaturasReachedError';
 
 export const validateCreateCandidatura = async (req: Request, res: Response, next: NextFunction) => {
 	try {
+		const candidaturaRepository = new CandidaturaRepository();
 		if(!req.body.authenticatedUser.isCandidato) throw new CandidatoOnlyError();
 
 		const candidato = await db.getRepository(UserEntity).findOneBy({uuid: req.body.authenticatedUser.sub});
@@ -22,8 +26,19 @@ export const validateCreateCandidatura = async (req: Request, res: Response, nex
 		if(!vaga) throw new VagaNotFoundError();
 		if(!vaga.ativa) throw new VagaExpiredError();
 
+		const candidaturasFromVaga = await candidaturaRepository.getByVaga(vaga.uuid);
+
+		if(candidaturasFromVaga.find(c => c.vaga.uuid === vaga.uuid)) {
+			throw new CandidatoAlreadyAppliedError();
+		}
+
+		if(candidaturasFromVaga.length === vaga.maxCandidatos) {
+			throw new MaxCandidaturasReachedError();
+		}
+
 		next();
 	} catch (error:any) {
+
 		handleError(error, res);
 	}
 };
