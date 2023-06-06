@@ -1,28 +1,9 @@
-/* eslint-disable indent */
-import { AutoMap } from '@automapper/classes';
-
-export class VagaDTO {
-	@AutoMap()
-	uuid: string;
-
-	@AutoMap()
-	createdAt: Date;
-
-	@AutoMap()
-	updatedAt: Date;
-
-	@AutoMap()
-	descricao: string;
-
-	@AutoMap()
-	nomeEmpresa: string; 
-
-	@AutoMap()
-	maxCandidatos: number; 
-
-	@AutoMap()
+export interface VagaDTO {
+	id: string;
+	criadaEm: Date;
+	nomeEmpresa: string;
+	maxCandidatos: number;
 	dataLimite: string;
-
-	@AutoMap()
-	recrutadorUuid: string;
+	idRecrutador: string;
+	ativa: boolean;
 }

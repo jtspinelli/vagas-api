@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { VagaRepository } from './repository';
 import { CreateVagaUsecase } from './usecases/createVagaUsecase/createVagaUsecase';
-import { handleControllerError } from '../../shared/exceptions';
+import { handleError } from '../../shared/exceptions';
 
 export const listVagasController = async (req: Request, res: Response) => {
 	try {
@@ -24,6 +24,6 @@ export const createVagaController = async (req: Request, res: Response) => {
 
 		return res.send(createdVaga);
 	} catch (error: any) {
-		handleControllerError(error, res);
+		handleError(error, res);
 	}
 };

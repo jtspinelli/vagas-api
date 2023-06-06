@@ -10,23 +10,23 @@ export abstract class BaseEntity {
 	@AutoMap()
 	uuid: string;
 
-	@Column({name: 'created_at'})
+	@Column({name: 'criado_em'})
 	@AutoMap()
-	createdAt: Date;
+	criadoEm: Date;
 
-	@Column({name: 'updated_at'})
+	@Column({name: 'atualizado_em'})
 	@AutoMap()
-	updatedAt: Date;
+	atualizadoEm: Date;
 
 	@BeforeInsert()
 	createId(){
 		this.uuid = uuid();
-		this.createdAt = new Date();
-		this.updatedAt = new Date();
+		this.criadoEm = new Date();
+		this.atualizadoEm = new Date();
 	}
 
 	@BeforeUpdate()
 	setUpdatedAt(){
-		this.updatedAt = new Date();
+		this.atualizadoEm = new Date();
 	}
 }

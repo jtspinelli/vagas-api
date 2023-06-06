@@ -1,8 +1,8 @@
 import { Response } from 'express';
 
-export class RecrutadorNotFoundError extends Error {
+export class CandidatoNotFoundError extends Error {
 	constructor() {
-		super('Recrutador não encontrado.');
+		super('Candidato não encontrado.');
 	}
 
 	respond(res: Response) {
