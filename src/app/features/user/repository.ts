@@ -23,7 +23,7 @@ export class UserRepository {
 
 		const query = this.userRepository
 			.createQueryBuilder('userEntity')
-			.orderBy('userEntity.createdAt', 'DESC');
+			.orderBy('userEntity.criadoEm', 'DESC');
 
 		if(name){
 			query.where('lower(userEntity.name) like :name', {name: `%${name}%`});

@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from 'express';
-import { RecrutadorRequiredError } from '../../shared/exceptions/RecrutadorNotFoundError';
+import { RecrutadorRequiredError } from '../../shared/exceptions/RecrutadorRequiredError';
 import { handleError } from '../../shared/exceptions';
-import { CandidatoOnlyError } from '../../shared/exceptions/CandidatoOnlyError';
-import { VagaRepository } from './repository';
-import { VagaNotFoundError } from '../../shared/exceptions/VagaNotFoundError';
-import { VagaExpiredError } from '../../shared/exceptions/VagaExpiredError';
+import db from '../../../main/config/dataSource';
+import { UserEntity } from '../../shared/database/entities/user.entity';
+import { RecrutadorNotFoundError } from '../../shared/exceptions/RecrutadorNotFoundError';
 
 export const checkGetVagasQueryParams = (req: Request, res: Response, next: NextFunction) => {
 	if(req.query.limit && (isNaN(Number(req.query.limit)) || Number(req.query.limit) > 10)){
@@ -24,6 +23,9 @@ export const validateCreateVaga = async (req: Request, res: Response, next: Next
 		const { authenticatedUser, descricao, nomeEmpresa, maxCandidatos, dataLimite } = req.body;
 		
 		if(!authenticatedUser.isRecrutador) throw new RecrutadorRequiredError();
+
+		const recrutador = await db.getRepository(UserEntity).findOneBy({uuid: authenticatedUser.sub});
+		if(!recrutador) throw new RecrutadorNotFoundError();
 	
 		if(typeof descricao !== 'string') return res.status(400).send('Propriedade descrição inválida');
 		if(typeof nomeEmpresa !== 'string') return res.status(400).send('Propriedade nomeEmpresa inválida');
@@ -34,20 +36,4 @@ export const validateCreateVaga = async (req: Request, res: Response, next: Next
 	} catch (error: any) {
 		handleError(error, res);
 	}
-};
-
-export const validateApplyToVaga = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		if(!req.body.authenticatedUser.isCandidato) throw new CandidatoOnlyError();
-
-		const vagaRepository = new VagaRepository();
-		const vaga = await vagaRepository.get(req.params.vaga_id);
-
-		if(!vaga) throw new VagaNotFoundError();
-		if(!vaga.ativa) throw new VagaExpiredError();
-
-		next();
-	} catch (error:any) {
-		handleError(error, res);
-	}	
 };

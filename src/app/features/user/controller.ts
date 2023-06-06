@@ -3,6 +3,7 @@ import { CreateUserUsecase } from './usecases/createUser/createUserUsecase';
 import { GetUsersUsecase } from './usecases/getUsers/getUsersUsecase';
 import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
 import { UserRepository } from './repository';
+import { QueryFailedError } from 'typeorm';
 
 export const createUserController = async (req: Request, res: Response) => {
 	try {
@@ -24,7 +25,15 @@ export const createUserController = async (req: Request, res: Response) => {
 export const getUsersController = async (req: Request, res: Response) => {
 	const userRepository = new UserRepository();
 	const getUsersUsecase = new GetUsersUsecase(userRepository);
-	const users = await getUsersUsecase.execute(req);	
-
-	return res.status(200).send(users);
+	
+	try {
+		const users = await getUsersUsecase.execute(req);
+		return res.status(200).send(users);
+	} catch(error: any) {
+		if(error instanceof QueryFailedError){
+			console.log(error.message);	
+			console.log(error.parameters);	
+		}
+		return res.status(500).send({});
+	}	
 };

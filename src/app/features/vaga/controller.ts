@@ -27,7 +27,3 @@ export const createVagaController = async (req: Request, res: Response) => {
 		handleError(error, res);
 	}
 };
-
-export const applyToVaga = async (req: Request, res: Response) => {
-	return res.send('Okaaay');
-};
