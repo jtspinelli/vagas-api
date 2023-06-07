@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { CreateUserUsecase } from './usecases/createUser/createUserUsecase';
 import { GetUsersUsecase } from './usecases/getUsers/getUsersUsecase';
 import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
 import { UserRepository } from './repository';
-import { QueryFailedError } from 'typeorm';
+import { CandidaturaRepository } from '../candidatura/repository';
+import { GetVagasAplicadasUsecase } from './usecases/getVagasAplicadas/getVagasAplicadasUseCase';
 
 export const createUserController = async (req: Request, res: Response) => {
 	try {
@@ -30,10 +32,13 @@ export const getUsersController = async (req: Request, res: Response) => {
 		const users = await getUsersUsecase.execute(req);
 		return res.status(200).send(users);
 	} catch(error: any) {
-		if(error instanceof QueryFailedError){
-			console.log(error.message);	
-			console.log(error.parameters);	
-		}
 		return res.status(500).send({});
 	}	
+};
+
+export const getVagasAplicadasController = async (req: Request, res: Response) => {
+	const candidaturaRepository = new CandidaturaRepository();
+	const getvagasAplicadasUsecase = new GetVagasAplicadasUsecase(candidaturaRepository);
+
+	return res.send(await getvagasAplicadasUsecase.execute(req.query, req.params.id));
 };

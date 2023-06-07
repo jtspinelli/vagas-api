@@ -5,6 +5,8 @@ import { badRequest, unauthorized } from '../../helpers/httpResponses';
 import { UserTipo } from './enums/userTipo';
 import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
 import { handleError } from '../../shared/exceptions';
+import { CandidatoOnlyError } from '../../shared/exceptions/CandidatoOnlyError';
+import { CandidatoNotFoundError } from '../../shared/exceptions/CandidatoNotFoundError';
 
 function isValidString(value: any) {
 	return typeof value == 'string' && value.trim().length > 0;
@@ -70,4 +72,17 @@ export const validateCreateUser = async (req: Request, res: Response, next: Next
 	} catch (error: any) {
 		handleError(error, res);
 	}
+};
+
+export const validateGetVagasAplicadas = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const userRepository = new UserRepository();
+		const candidato = await userRepository.findByUuid(req.params.id);
+
+		if(!candidato) throw new CandidatoNotFoundError();
+		if(!req.body.authenticatedUser.isCandidato) throw new CandidatoOnlyError();
+		next();
+	} catch (error: any) {
+		handleError(error, res);
+	}	
 };
