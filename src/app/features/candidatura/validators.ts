@@ -28,7 +28,7 @@ export const validateCreateCandidatura = async (req: Request, res: Response, nex
 
 		const candidaturasFromVaga = await candidaturaRepository.getByVagaPagedList(req.query, vaga.uuid);
 
-		if(candidaturasFromVaga.data.find(c => c.vaga.uuid === vaga.uuid)) {
+		if(candidaturasFromVaga.data.map(c => c.candidato.uuid).includes(req.body.authenticatedUser.sub)) {
 			throw new CandidatoAlreadyAppliedError();
 		}
 

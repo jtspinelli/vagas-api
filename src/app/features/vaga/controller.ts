@@ -5,11 +5,14 @@ import { CreateVagaUsecase } from './usecases/createVagaUsecase/createVagaUsecas
 import { handleError } from '../../shared/exceptions';
 import { CandidaturaRepository } from '../candidatura/repository';
 import { GetCandidatosUsecase } from './usecases/getCandidatosUsecase/getCandidatosUsecase';
+import { GetVagasUsecase } from './usecases/getVagasUsecase/getVagasUsecase';
 
 export const listVagasController = async (req: Request, res: Response) => {
 	try {
-		const repository = new VagaRepository();
-		const vagas = await repository.getPagedList(req.query);
+		const vagaRepository = new VagaRepository();
+		const candidaturaRepository = new CandidaturaRepository();
+		const getVagasUsecase = new GetVagasUsecase(vagaRepository, candidaturaRepository);		
+		const vagas = await getVagasUsecase.execute(req.body.authenticatedUser, req.query);
 
 		res.status(200).send(vagas);
 	} catch (error) {
