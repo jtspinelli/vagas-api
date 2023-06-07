@@ -26,7 +26,7 @@ export const validateCreateCandidatura = async (req: Request, res: Response, nex
 		if(!vaga) throw new VagaNotFoundError();
 		if(!vaga.ativa) throw new VagaExpiredError();
 
-		const candidaturasFromVaga = await candidaturaRepository.getByVaga(req.query, vaga.uuid);
+		const candidaturasFromVaga = await candidaturaRepository.getByVagaPagedList(req.query, vaga.uuid);
 
 		if(candidaturasFromVaga.data.find(c => c.vaga.uuid === vaga.uuid)) {
 			throw new CandidatoAlreadyAppliedError();

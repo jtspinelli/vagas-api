@@ -13,7 +13,7 @@ export class GetCandidatosUsecase {
 	}
 	
 	async execute(queryParams: any, vagaUuid: string, recrutadorUuid: string) {
-		const candidaturas = await this.candidaturaRepository.getByVagaCreatedByRecrutador(queryParams, vagaUuid, recrutadorUuid);
+		const candidaturas = await this.candidaturaRepository.getByVagaCreatedByRecrutadorPagedList(queryParams, vagaUuid, recrutadorUuid);
 		const candidatos = candidaturas.data.map(c => mapper.map(c.candidato, UserEntity, UserDTO));			
 
 		return new Page<UserDTO>(

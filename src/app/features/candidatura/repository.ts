@@ -25,7 +25,7 @@ export class CandidaturaRepository {
 			.getMany();
 	}
 
-	async getVagasAplicadasByCandidato(queryParams: any, candidatoUuid: string) {
+	async getVagasAplicadasByCandidatoPagedList(queryParams: any, candidatoUuid: string) {
 		const page = Number(queryParams.page) || 1;
 		const limit = Number(queryParams.limit || appEnv.paginationLimit);
 
@@ -47,7 +47,7 @@ export class CandidaturaRepository {
 		);
 	}
 
-	async getByVaga(queryParams: any, vagaUuid: string) {
+	async getByVagaPagedList(queryParams: any, vagaUuid: string) {
 		const page = Number(queryParams.page) || 1;
 		const limit = Number(queryParams.limit || appEnv.paginationLimit);
 
@@ -68,7 +68,7 @@ export class CandidaturaRepository {
 		);
 	}
 
-	async getByVagaCreatedByRecrutador(queryParams: any, vagaUuid: string, recrutadorUuid: string) {
+	async getByVagaCreatedByRecrutadorPagedList(queryParams: any, vagaUuid: string, recrutadorUuid: string) {
 		const page = Number(queryParams.page) || 1;
 		const limit = Number(queryParams.limit || appEnv.paginationLimit);
 

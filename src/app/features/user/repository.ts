@@ -16,7 +16,7 @@ export class UserRepository {
 		this.userRepository = db.getRepository(UserEntity);
 	}
 
-	async getAll(req: Request): Promise<Page<UserDTO | RecrutadorUserDTO>> {
+	async getPagedList(req: Request): Promise<Page<UserDTO | RecrutadorUserDTO>> {
 		const { name, tipo } = req.query;
 		const page = Number(req.query.page) || 1;
 		const limit = Number(req.query.limit || appEnv.paginationLimit);

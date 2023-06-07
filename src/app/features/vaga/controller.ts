@@ -9,7 +9,7 @@ import { GetCandidatosUsecase } from './usecases/getCandidatosUsecase/getCandida
 export const listVagasController = async (req: Request, res: Response) => {
 	try {
 		const repository = new VagaRepository();
-		const vagas = await repository.getAll(req.query);
+		const vagas = await repository.getPagedList(req.query);
 
 		res.status(200).send(vagas);
 	} catch (error) {

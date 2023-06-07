@@ -7,6 +7,6 @@ export class GetUsersUsecase {
 	}
 
 	async execute(req: Request) {
-		return this.repository.getAll(req);
+		return this.repository.getPagedList(req);
 	}
 }

@@ -9,7 +9,7 @@ export class GetVagasAplicadasUsecase {
 	}
 
 	async execute(queryparams: any, candidatoUuid: string) {
-		return (await this.candidaturaRepository.getVagasAplicadasByCandidato(queryparams, candidatoUuid));
+		return (await this.candidaturaRepository.getVagasAplicadasByCandidatoPagedList(queryparams, candidatoUuid));
 
 	}
 }

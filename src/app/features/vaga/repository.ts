@@ -17,7 +17,7 @@ export class VagaRepository {
 		return this.vagaRepository.findOneBy({uuid});
 	}
 
-	async getAll(queryParams: any): Promise<Page<VagaDTO>> {
+	async getPagedList(queryParams: any): Promise<Page<VagaDTO>> {
 		const { descricao } = queryParams;
 		const page = Number(queryParams.page) || 1;
 		const limit = Number(queryParams.limit || appEnv.paginationLimit);
