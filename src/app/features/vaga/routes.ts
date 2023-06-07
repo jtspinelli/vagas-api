@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { createVagaController, listVagasController } from './controller';
-import { checkGetVagasQueryParams, validateCreateVaga } from './validators';
+import { createVagaController, getCandidatosController, listVagasController } from './controller';
+import { checkGetVagasQueryParams, validateCreateVaga, validateGetCandidatos } from './validators';
 import { authenticationMiddleware } from '../../shared/middlewares/authenticationMiddleware';
 
 const vagaRouter = Router();
@@ -8,6 +8,6 @@ const vagaRouter = Router();
 vagaRouter.use('/', authenticationMiddleware);
 vagaRouter.get('/', checkGetVagasQueryParams, listVagasController);
 vagaRouter.post('/', validateCreateVaga, createVagaController);
-// vagaRouter.post('/apply/:vaga_id', validateApplyToVaga, applyToVaga);
+vagaRouter.get('/:id/candidatos', validateGetCandidatos, getCandidatosController);
 
 export { vagaRouter };

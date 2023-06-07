@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Repository } from 'typeorm';
 import { CandidaturaEntity } from '../../shared/database/entities/candidatura.entity';
 import { appEnv } from '../../env/appEnv';
@@ -46,15 +47,50 @@ export class CandidaturaRepository {
 		);
 	}
 
-	async getByVaga(vagaUuid: string) {
-		return await this.candidaturaRepository.createQueryBuilder('candidatura')
+	async getByVaga(queryParams: any, vagaUuid: string) {
+		const page = Number(queryParams.page) || 1;
+		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+
+		const query = this.candidaturaRepository.createQueryBuilder('candidatura')
 			.leftJoinAndSelect('candidatura.candidato', 'candidato')
 			.leftJoinAndSelect('candidatura.vaga', 'vaga')
-			.where('candidatura.vaga_uuid = :vagaUuid', {vagaUuid})
-			.getMany();
+			.where('candidatura.vaga_uuid = :vagaUuid', {vagaUuid});			
+
+		query.skip(page * limit - limit);
+		query.take(limit);
+
+		const totalPages = Math.ceil(await query.getCount() / limit);
+		const count = await query.getCount();
+		const candidaturas = await query.getMany();
+
+		return new Page<CandidaturaEntity>(
+			page, totalPages, count, candidaturas
+		);
+	}
+
+	async getByVagaCreatedByRecrutador(queryParams: any, vagaUuid: string, recrutadorUuid: string) {
+		const page = Number(queryParams.page) || 1;
+		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+
+		const query = this.candidaturaRepository.createQueryBuilder('candidatura')
+			.leftJoinAndSelect('candidatura.candidato', 'candidato')
+			.leftJoinAndSelect('candidatura.vaga', 'vaga')
+			.where('vaga.recrutador_uuid = :recrutadorUuid', {recrutadorUuid})
+			.andWhere('candidatura.vaga_uuid = :vagaUuid', {vagaUuid});			
+
+		query.skip(page * limit - limit);
+		query.take(limit);
+
+		const totalPages = Math.ceil(await query.getCount() / limit);
+		const count = await query.getCount();
+		const candidaturas = await query.getMany();
+
+		return new Page<CandidaturaEntity>(
+			page, totalPages, count, candidaturas
+		);
 	}
 
 	async save(candidatura: CandidaturaEntity) {
 		return await this.candidaturaRepository.save(candidatura);
-	} 
+	}
 }

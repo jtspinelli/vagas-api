@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import { VagaRepository } from './repository';
 import { CreateVagaUsecase } from './usecases/createVagaUsecase/createVagaUsecase';
 import { handleError } from '../../shared/exceptions';
+import { CandidaturaRepository } from '../candidatura/repository';
+import { GetCandidatosUsecase } from './usecases/getCandidatosUsecase/getCandidatosUsecase';
 
 export const listVagasController = async (req: Request, res: Response) => {
 	try {
@@ -26,4 +28,11 @@ export const createVagaController = async (req: Request, res: Response) => {
 	} catch (error: any) {
 		handleError(error, res);
 	}
+};
+
+export const getCandidatosController = async (req: Request, res: Response) => {
+	const candidaturaRepository = new CandidaturaRepository();
+	const getCandidatosUsecase = new GetCandidatosUsecase(candidaturaRepository);
+
+	return res.status(200).send(await getCandidatosUsecase.execute(req.query, req.params.id, req.body.authenticatedUser.sub));
 };

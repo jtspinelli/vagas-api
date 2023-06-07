@@ -45,7 +45,7 @@ export class UserRepository {
 		query.take(limit);
 
 		const totalPages = Math.ceil(await query.getCount() / limit);
-		const count = await query.getCount();	
+		const count = await query.getCount();
 		const users = (await query.getMany()).map(user => {
 			return user.nomeEmpresa === null
 				? mapper.map(user, UserEntity, UserDTO)

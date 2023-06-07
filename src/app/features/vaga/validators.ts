@@ -2,9 +2,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { RecrutadorRequiredError } from '../../shared/exceptions/RecrutadorRequiredError';
 import { handleError } from '../../shared/exceptions';
-import db from '../../../main/config/dataSource';
 import { UserEntity } from '../../shared/database/entities/user.entity';
 import { RecrutadorNotFoundError } from '../../shared/exceptions/RecrutadorNotFoundError';
+import { VagaEntity } from '../../shared/database/entities/vaga.entity';
+import { VagaNotFoundError } from '../../shared/exceptions/VagaNotFoundError';
+import db from '../../../main/config/dataSource';
 
 export const checkGetVagasQueryParams = (req: Request, res: Response, next: NextFunction) => {
 	if(req.query.limit && (isNaN(Number(req.query.limit)) || Number(req.query.limit) > 10)){
@@ -36,4 +38,16 @@ export const validateCreateVaga = async (req: Request, res: Response, next: Next
 	} catch (error: any) {
 		handleError(error, res);
 	}
+};
+
+export const validateGetCandidatos = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		if(!req.body.authenticatedUser.isRecrutador) throw new RecrutadorRequiredError();
+		
+		const vaga = await db.getRepository(VagaEntity).findOneBy({uuid: req.params.id});
+		if(!vaga) throw new VagaNotFoundError();	
+		next();
+	} catch (error: any) {
+		handleError(error, res);
+	}	
 };
