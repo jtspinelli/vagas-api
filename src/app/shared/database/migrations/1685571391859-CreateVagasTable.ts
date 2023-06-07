@@ -8,13 +8,13 @@ export class CreateVagasTable1685571391859 implements MigrationInterface {
 				name: 'vagas',
 				columns: [
 					new TableColumn({ name: 'uuid', type: 'varchar', isPrimary: true }),
-					new TableColumn({ name: 'created_at', type: 'varchar' }),
-					new TableColumn({ name: 'updated_at', type: 'varchar' }),
+					new TableColumn({ name: 'criado_em', type: 'timestamp' }),
+					new TableColumn({ name: 'atualizado_em', type: 'timestamp' }),
 					new TableColumn({ name: 'recrutador_uuid', type: 'varchar' }),
 					new TableColumn({ name: 'descricao', type: 'varchar' }),
 					new TableColumn({ name: 'nome_empresa', type: 'varchar' }),
 					new TableColumn({ name: 'data_limite', type: 'timestamp' }),
-					new TableColumn({ name: 'ativo', type: 'boolean', default: true }),
+					new TableColumn({ name: 'ativa', type: 'boolean', default: true }),
 					new TableColumn({ name: 'max_candidatos', type: 'int', isNullable: true })
 				],
 				foreignKeys: [

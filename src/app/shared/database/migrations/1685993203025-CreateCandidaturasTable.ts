@@ -8,6 +8,8 @@ export class CreateCandidaturasTable1685993203025 implements MigrationInterface 
 				name: 'candidaturas',
 				columns: [
 					new TableColumn({ name: 'uuid', type: 'varchar', isPrimary: true }),
+					new TableColumn({ name: 'criado_em', type: 'timestamp' }),
+					new TableColumn({ name: 'atualizado_em', type: 'timestamp' }),
 					new TableColumn({ name: 'vaga_descricao', type: 'varchar' }),
 					new TableColumn({ name: 'data_cadastro', type: 'timestamp' }),
 					new TableColumn({ name: 'sucesso', type: 'boolean', isNullable: true }),
@@ -23,7 +25,8 @@ export class CreateCandidaturasTable1685993203025 implements MigrationInterface 
 					{
 						columnNames: ['vaga_uuid'],
 						referencedTableName: 'vagas',
-						referencedColumnNames: ['uuid']
+						referencedColumnNames: ['uuid'],
+						onDelete: 'CASCADE'
 					},
 				]
 			})

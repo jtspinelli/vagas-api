@@ -8,7 +8,8 @@ export class CreateUsersTable1684975171579 implements MigrationInterface {
 				name: 'users',
 				columns: [
 					new TableColumn({ name: 'uuid', type: 'varchar', isPrimary: true }),
-					new TableColumn({ name: 'created_at', type: 'varchar' }),
+					new TableColumn({ name: 'criado_em', type: 'timestamp' }),
+					new TableColumn({ name: 'atualizado_em', type: 'timestamp' }),
 					new TableColumn({ name: 'name', type: 'varchar' }),
 					new TableColumn({ name: 'email', type: 'varchar' }),
 					new TableColumn({ name: 'senha', type: 'varchar' }),
