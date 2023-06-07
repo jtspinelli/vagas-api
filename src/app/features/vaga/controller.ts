@@ -7,6 +7,7 @@ import { CandidaturaRepository } from '../candidatura/repository';
 import { GetCandidatosUsecase } from './usecases/getCandidatosUsecase/getCandidatosUsecase';
 import { GetVagasUsecase } from './usecases/getVagasUsecase/getVagasUsecase';
 import { VagaEntity } from '../../shared/database/entities/vaga.entity';
+import { DeleteVagaUsecase } from './usecases/deleteVagaUsecase/deleteVagaUsecase';
 import db from '../../../main/config/dataSource';
 
 export const listVagasController = async (req: Request, res: Response) => {
@@ -56,4 +57,11 @@ export const desativarVagaController = async (req: Request, res: Response) => {
 export const ativarVagaController = async (req: Request, res: Response) => {
 	return setVagaAtiva(res, req.body.vaga as VagaEntity, true);
 
+};
+
+export const deleteVagaController = async (req: Request, res: Response) => {
+	const vagaRepository = new VagaRepository();
+	const deleteVagaUsecase = new DeleteVagaUsecase(vagaRepository);
+		
+	return res.send({deleted: (await deleteVagaUsecase.execute(req.body.vaga)).uuid});
 };

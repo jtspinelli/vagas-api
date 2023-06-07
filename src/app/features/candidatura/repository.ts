@@ -142,4 +142,8 @@ export class CandidaturaRepository {
 	async save(candidatura: CandidaturaEntity) {
 		return await this.candidaturaRepository.save(candidatura);
 	}
+
+	async remove(candidatura: CandidaturaEntity) {
+		return await this.candidaturaRepository.remove(candidatura);
+	}
 }

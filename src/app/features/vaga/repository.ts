@@ -45,4 +45,8 @@ export class VagaRepository {
 	async create(vagaToCreate: VagaEntity) {		
 		return this.vagaRepository.save(vagaToCreate);
 	}
+
+	async remove(vaga: VagaEntity) {
+		return await this.vagaRepository.remove(vaga);
+	}
 }

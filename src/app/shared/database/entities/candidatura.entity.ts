@@ -21,14 +21,14 @@ export class CandidaturaEntity extends BaseEntity {
 	@Column({ name: 'data_cadastro' })
 	dataCadastro: Date;
 
-	@Column()
+	@Column({ nullable: true })
 	sucesso: boolean;
 
 	@ManyToOne(() => UserEntity)
 	@JoinColumn({ name: 'candidato_uuid' })
 	candidato: UserEntity;
 
-	@ManyToOne(() => VagaEntity)
+	@ManyToOne(() => VagaEntity, (vaga) => vaga.candidaturas, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'vaga_uuid' })
 	vaga: VagaEntity;
 

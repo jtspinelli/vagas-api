@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable indent */
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BaseEntity } from './base.entity';
 import { AutoMap } from '@automapper/classes';
 import { VagaDTO } from '../../../features/vaga/usecases/getVagasUsecase/VagaDTO';
+import { CandidaturaEntity } from './candidatura.entity';
 
 @Entity('vagas')
 export class VagaEntity extends BaseEntity {
@@ -31,6 +32,9 @@ export class VagaEntity extends BaseEntity {
 	@Column()
 	@AutoMap()
 	ativa: boolean = true;
+
+	@OneToMany(() => CandidaturaEntity, (candidatura) => candidatura.vaga)
+	candidaturas: CandidaturaEntity[];
 
 	public toJson(): VagaDTO {
 		return {

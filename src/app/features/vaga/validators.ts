@@ -10,6 +10,7 @@ import { VagaAlreadyDeactivatedError } from '../../shared/exceptions/VagaAlready
 import { VagaAlreadyActiveError } from '../../shared/exceptions/VagaAlreadyActiveError';
 import { VagaActivationForbiddenError } from '../../shared/exceptions/VagaActivationForbiddenError';
 import db from '../../../main/config/dataSource';
+import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
 
 export const checkGetVagasQueryParams = (req: Request, res: Response, next: NextFunction) => {
 	if(req.query.limit && (isNaN(Number(req.query.limit)) || Number(req.query.limit) > 10)){
@@ -60,8 +61,9 @@ export const requireRecrutador = (req: Request) => {
 };
 
 export const requireValidVagaId = async (req: Request) => {
-	const vaga = await db.getRepository(VagaEntity).findOneBy({uuid: req.params.id});
+	const vaga = await db.getRepository(VagaEntity).findOne({where: {uuid: req.params.id}, relations: { candidaturas: true }});
 	if(!vaga) throw new VagaNotFoundError();
+
 	return vaga;
 };
 
@@ -70,6 +72,7 @@ export const validateDesativarVaga = async (req: Request, res: Response, next: N
 		requireRecrutador(req);
 		req.body.vaga = await requireValidVagaId(req);
 		if(!req.body.vaga.ativa) throw new VagaAlreadyDeactivatedError();
+		
 		next();
 	} catch (error: any) {
 		handleError(error, res);
@@ -86,6 +89,18 @@ export const validateAtivarVaga = async (req: Request, res: Response, next: Next
 		if(passedDataLimite) throw new VagaActivationForbiddenError();
 		next();
 	} catch (error: any) {
+		handleError(error, res);
+	}
+};
+
+export const validateDeleteVaga = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		requireRecrutador(req);
+		req.body.vaga = await requireValidVagaId(req);
+		if((req.body.vaga as VagaEntity).recrutadorUuid !== req.body.authenticatedUser.sub) throw new ForbiddenError('Acesso negado.');
+
+		next();
+	} catch(error: any) {
 		handleError(error, res);
 	}
 };
