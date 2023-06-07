@@ -6,6 +6,8 @@ import { handleError } from '../../shared/exceptions';
 import { CandidaturaRepository } from '../candidatura/repository';
 import { GetCandidatosUsecase } from './usecases/getCandidatosUsecase/getCandidatosUsecase';
 import { GetVagasUsecase } from './usecases/getVagasUsecase/getVagasUsecase';
+import { VagaEntity } from '../../shared/database/entities/vaga.entity';
+import db from '../../../main/config/dataSource';
 
 export const listVagasController = async (req: Request, res: Response) => {
 	try {
@@ -38,4 +40,20 @@ export const getCandidatosController = async (req: Request, res: Response) => {
 	const getCandidatosUsecase = new GetCandidatosUsecase(candidaturaRepository);
 
 	return res.status(200).send(await getCandidatosUsecase.execute(req.query, req.params.id, req.body.authenticatedUser.sub));
+};
+
+const setVagaAtiva = (res: Response, vaga: VagaEntity, value: boolean) => {
+	vaga.ativa = value;
+	db.getRepository(VagaEntity).save(vaga);
+
+	return res.status(204).send({});
+};
+
+export const desativarVagaController = async (req: Request, res: Response) => {
+	return setVagaAtiva(res, req.body.vaga as VagaEntity, false);
+};
+
+export const ativarVagaController = async (req: Request, res: Response) => {
+	return setVagaAtiva(res, req.body.vaga as VagaEntity, true);
+
 };

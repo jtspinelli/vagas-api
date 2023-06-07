@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable indent */
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { UserEntity } from './user.entity';
@@ -27,9 +28,9 @@ export class VagaEntity extends BaseEntity {
 	@AutoMap()
 	maxCandidatos: number;
 
-	public get ativa() {
-		return new Date(this.dataLimite) > new Date();
-	}
+	@Column()
+	@AutoMap()
+	ativa: boolean = true;
 
 	public toJson(): VagaDTO {
 		return {

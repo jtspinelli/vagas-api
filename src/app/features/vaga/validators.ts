@@ -6,6 +6,9 @@ import { UserEntity } from '../../shared/database/entities/user.entity';
 import { RecrutadorNotFoundError } from '../../shared/exceptions/RecrutadorNotFoundError';
 import { VagaEntity } from '../../shared/database/entities/vaga.entity';
 import { VagaNotFoundError } from '../../shared/exceptions/VagaNotFoundError';
+import { VagaAlreadyDeactivatedError } from '../../shared/exceptions/VagaAlreadyDeactivatedError';
+import { VagaAlreadyActiveError } from '../../shared/exceptions/VagaAlreadyActiveError';
+import { VagaActivationForbiddenError } from '../../shared/exceptions/VagaActivationForbiddenError';
 import db from '../../../main/config/dataSource';
 
 export const checkGetVagasQueryParams = (req: Request, res: Response, next: NextFunction) => {
@@ -50,4 +53,39 @@ export const validateGetCandidatos = async (req: Request, res: Response, next: N
 	} catch (error: any) {
 		handleError(error, res);
 	}	
+};
+
+export const requireRecrutador = (req: Request) => {	
+	if(!req.body.authenticatedUser.isRecrutador) throw new RecrutadorRequiredError();	
+};
+
+export const requireValidVagaId = async (req: Request) => {
+	const vaga = await db.getRepository(VagaEntity).findOneBy({uuid: req.params.id});
+	if(!vaga) throw new VagaNotFoundError();
+	return vaga;
+};
+
+export const validateDesativarVaga = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		requireRecrutador(req);
+		req.body.vaga = await requireValidVagaId(req);
+		if(!req.body.vaga.ativa) throw new VagaAlreadyDeactivatedError();
+		next();
+	} catch (error: any) {
+		handleError(error, res);
+	}	
+};
+
+export const validateAtivarVaga = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		requireRecrutador(req);
+		req.body.vaga = await requireValidVagaId(req);
+		if(req.body.vaga.ativa) throw new VagaAlreadyActiveError();
+
+		const passedDataLimite = new Date(req.body.vaga.dataLimite) < new Date();
+		if(passedDataLimite) throw new VagaActivationForbiddenError();
+		next();
+	} catch (error: any) {
+		handleError(error, res);
+	}
 };

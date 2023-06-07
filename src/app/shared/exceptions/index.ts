@@ -9,6 +9,9 @@ import { CandidatoNotFoundError } from './CandidatoNotFoundError';
 import { CandidatoOnlyError } from './CandidatoOnlyError';
 import { CandidatoAlreadyAppliedError } from './CandidateAlreadyAppliedError';
 import { MaxCandidaturasReachedError } from './MaxCandidaturasReachedError';
+import { VagaAlreadyDeactivatedError } from './VagaAlreadyDeactivatedError';
+import { VagaAlreadyActiveError } from './VagaAlreadyActiveError';
+import { VagaActivationForbiddenError } from './VagaActivationForbiddenError';
 
 export function handleError(error: Error, res: Response) {
 	if(error instanceof ForbiddenError 
@@ -19,7 +22,10 @@ export function handleError(error: Error, res: Response) {
 		|| error instanceof RecrutadorNotFoundError
 		|| error instanceof CandidatoNotFoundError
 		|| error instanceof CandidatoAlreadyAppliedError
-		|| error instanceof MaxCandidaturasReachedError){
+		|| error instanceof MaxCandidaturasReachedError
+		|| error instanceof VagaAlreadyDeactivatedError
+		|| error instanceof VagaAlreadyActiveError
+		|| error instanceof VagaActivationForbiddenError){
 		return error.respond(res);
 	}
 
