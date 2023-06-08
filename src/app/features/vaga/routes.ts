@@ -1,12 +1,14 @@
 import { Router } from 'express';
-import { ativarVagaController, createVagaController, deleteVagaController, desativarVagaController, getCandidatosController, listVagasController } from './controller';
-import { checkGetVagasQueryParams, validateAtivarVaga, validateCreateVaga, validateDeleteVaga, validateDesativarVaga, validateGetCandidatos } from './validators';
+import { ativarVagaController, createVagaController, deleteVagaController, desativarVagaController, getCandidatosController, getVagasFullCandidaturasController, getVagasSemCandidaturasController, listVagasController } from './controller';
+import { checkGetVagasQueryParams, validateAdminGetVagas, validateAtivarVaga, validateCreateVaga, validateDeleteVaga, validateDesativarVaga, validateGetCandidatos } from './validators';
 import { authenticationMiddleware } from '../../shared/middlewares/authenticationMiddleware';
 
 const vagaRouter = Router();
 
 vagaRouter.use('/', authenticationMiddleware);
 vagaRouter.get('/', checkGetVagasQueryParams, listVagasController);
+vagaRouter.get('/semcandidaturas', validateAdminGetVagas, getVagasSemCandidaturasController);
+vagaRouter.get('/candidaturasfull', validateAdminGetVagas, getVagasFullCandidaturasController);
 vagaRouter.post('/', validateCreateVaga, createVagaController);
 vagaRouter.get('/:id/candidatos', validateGetCandidatos, getCandidatosController);
 vagaRouter.patch('/:id/desativar', validateDesativarVaga, desativarVagaController);

@@ -7,4 +7,5 @@ export interface VagaDTO {
 	dataLimite: string;
 	idRecrutador: string;
 	ativa: boolean;
+	candidaturas?: number;
 }

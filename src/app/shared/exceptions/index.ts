@@ -12,12 +12,14 @@ import { MaxCandidaturasReachedError } from './MaxCandidaturasReachedError';
 import { VagaAlreadyDeactivatedError } from './VagaAlreadyDeactivatedError';
 import { VagaAlreadyActiveError } from './VagaAlreadyActiveError';
 import { VagaActivationForbiddenError } from './VagaActivationForbiddenError';
+import { AdminRequiredError } from './AdminRequiredError';
 
 export function handleError(error: Error, res: Response) {
 	if(error instanceof ForbiddenError 
 		|| error instanceof VagaNotFoundError 
 		|| error instanceof VagaExpiredError 
-		|| error instanceof RecrutadorRequiredError 
+		|| error instanceof RecrutadorRequiredError
+		|| error instanceof AdminRequiredError 
 		|| error instanceof CandidatoOnlyError
 		|| error instanceof RecrutadorNotFoundError
 		|| error instanceof CandidatoNotFoundError

@@ -8,6 +8,8 @@ import { GetCandidatosUsecase } from './usecases/getCandidatosUsecase/getCandida
 import { GetVagasUsecase } from './usecases/getVagasUsecase/getVagasUsecase';
 import { VagaEntity } from '../../shared/database/entities/vaga.entity';
 import { DeleteVagaUsecase } from './usecases/deleteVagaUsecase/deleteVagaUsecase';
+import { GetVagasSemCandidaturasUsecase } from './usecases/getVagasUsecase/getVagasSemCandidaturasUsecase';
+import { GetVagasFullCandidaturasUsecase } from './usecases/getVagasUsecase/getVagasFullCandidaturasUsecase';
 import db from '../../../main/config/dataSource';
 
 export const listVagasController = async (req: Request, res: Response) => {
@@ -18,6 +20,28 @@ export const listVagasController = async (req: Request, res: Response) => {
 		const vagas = await getVagasUsecase.execute(req.body.authenticatedUser, req.query);
 
 		res.status(200).send(vagas);
+	} catch (error: any) {
+		handleError(error, res);
+	}
+};
+
+export const getVagasSemCandidaturasController = async (req: Request, res: Response) => {
+	try {
+		const vagaRepository = new VagaRepository();
+		const getVagasSemCandidaturasUsecase = new GetVagasSemCandidaturasUsecase(vagaRepository);
+
+		res.send(await getVagasSemCandidaturasUsecase.execute(req.query));
+	} catch (error: any) {
+		handleError(error, res);
+	}
+};
+
+export const getVagasFullCandidaturasController = async (req: Request, res: Response) => {
+	try {
+		const vagaRepository = new VagaRepository();
+		const getVagasFullCandidaturasUsecase = new GetVagasFullCandidaturasUsecase(vagaRepository);
+		
+		res.send(await getVagasFullCandidaturasUsecase.execute(req.query));
 	} catch (error: any) {
 		handleError(error, res);
 	}

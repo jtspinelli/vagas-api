@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable indent */
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { AfterLoad, Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BaseEntity } from './base.entity';
 import { AutoMap } from '@automapper/classes';
@@ -36,6 +36,8 @@ export class VagaEntity extends BaseEntity {
 	@OneToMany(() => CandidaturaEntity, (candidatura) => candidatura.vaga)
 	candidaturas: CandidaturaEntity[];
 
+	candidaturasCount: number;
+
 	public toJson(): VagaDTO {
 		return {
 			id: this.uuid,
@@ -45,7 +47,8 @@ export class VagaEntity extends BaseEntity {
 			maxCandidatos: this.maxCandidatos,
 			nomeEmpresa: this.nomeEmpresa,
 			idRecrutador: this.recrutadorUuid,
-			ativa: this.ativa
+			ativa: this.ativa,
+			candidaturas: this.candidaturasCount
 		};
 	}
 

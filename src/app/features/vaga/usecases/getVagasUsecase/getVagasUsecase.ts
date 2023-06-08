@@ -23,12 +23,12 @@ export class GetVagasUsecase {
 		return {...vaga, candidatos};
 	}
 
-	async execute(authenticatedUser: {sub: string, isRecrutador: boolean }, queryParams: any) {
+	async execute(authenticatedUser: {sub: string, isRecrutador: boolean, isAdmin: boolean }, queryParams: any) {
 		if(authenticatedUser.isRecrutador) {
 			return await this.vagaRepository.getVagasFromRecrutador(queryParams, authenticatedUser.sub);
 		}
 		
-		const vagas = await this.vagaRepository.getPagedList(queryParams);
+		const vagas = await this.vagaRepository.getPagedList(queryParams, authenticatedUser.isAdmin);
 		return vagas;
 	}
 }

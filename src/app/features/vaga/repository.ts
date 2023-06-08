@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import db from '../../../main/config/dataSource';
 import { Repository } from 'typeorm';
@@ -21,17 +22,59 @@ export class VagaRepository {
 		return this.vagaRepository.findOneBy({uuid});
 	}
 
-	async getPagedList(queryParams: any): Promise<Page<VagaDTO>> {
-		const { descricao } = queryParams;
+	async getPagedList(queryParams: any, isAdmin: boolean, filterSemCandidaturas: boolean = false, filterFullCandidaturas: boolean = false): Promise<Page<VagaDTO>> {
+		const { descricao, criadoEm, recrutadorId, ativa } = queryParams;
 		const page = Number(queryParams.page) || 1;
 		const limit = Number(queryParams.limit || appEnv.paginationLimit);
 
 		const query = this.vagaRepository
 			.createQueryBuilder('vagaEntity')
+			.leftJoinAndSelect('vagaEntity.candidaturas', 'candidaturas')
 			.orderBy('vagaEntity.criadoEm', 'DESC');
 
 		if(descricao){
 			query.where('lower(vagaEntity.descricao) like :descricao', {descricao: `%${descricao}%`});
+		}
+
+		if(isAdmin && criadoEm) {
+			query.where('vagaEntity.criadoEm <= :criadoEm', {criadoEm});
+		}
+
+		if(isAdmin && recrutadorId) {
+			query.where('vagaEntity.recrutador_uuid = :recrutadorId', {recrutadorId});
+		}
+
+		if(isAdmin && ativa) {
+			query.where('vagaEntity.ativa = :ativa', {ativa});
+		}
+
+		if(isAdmin && filterSemCandidaturas) {
+			query.where(qb => {	
+				const subQuery = qb
+					.subQuery()
+					.select('vagaEntity.uuid')
+					.from(VagaEntity, 'vagaEntity')
+					.where('candidaturas.uuid is null')
+					.getQuery();
+				return 'vagaEntity.uuid IN ' + subQuery;
+			});
+
+			query.loadRelationCountAndMap('vagaEntity.candidaturasCount', 'vagaEntity.candidaturas');
+		}
+
+		if(isAdmin && filterFullCandidaturas) {
+			query.where(qb => {
+				const subQuery = qb
+					.subQuery()
+					.select('vagaEntity.uuid')
+					.from(VagaEntity, 'vagaEntity')
+					.groupBy('vagaEntity.uuid')
+					.having('COUNT(*) = vagaEntity.max_candidatos')
+					.getQuery();
+				return 'vagaEntity.uuid IN ' + subQuery;
+			});
+
+			query.loadRelationCountAndMap('vagaEntity.candidaturasCount', 'vagaEntity.candidaturas');
 		}
 
 		query.skip(page * limit - limit);
@@ -44,6 +87,14 @@ export class VagaRepository {
 		return new Page<VagaDTO>(
 			page, totalPages, count, vagas
 		);
+	}
+
+	async getVagasSemCandidaturas(queryParams: any) {
+		return await this.getPagedList(queryParams, true, true);
+	}
+
+	async getVagasFullCandidaturas(queryParams: any) {
+		return await this.getPagedList(queryParams, true, false, true);
 	}
 
 	async getVagasFromRecrutador(queryParams: any, recrutadorUuid: string) {

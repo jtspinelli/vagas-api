@@ -11,6 +11,7 @@ import { VagaAlreadyActiveError } from '../../shared/exceptions/VagaAlreadyActiv
 import { VagaActivationForbiddenError } from '../../shared/exceptions/VagaActivationForbiddenError';
 import db from '../../../main/config/dataSource';
 import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
+import { AdminRequiredError } from '../../shared/exceptions/AdminRequiredError';
 
 export const checkGetVagasQueryParams = (req: Request, res: Response, next: NextFunction) => {
 	if(req.query.limit && (isNaN(Number(req.query.limit)) || Number(req.query.limit) > 10)){
@@ -22,6 +23,16 @@ export const checkGetVagasQueryParams = (req: Request, res: Response, next: Next
 	}
 
 	next();
+};
+
+export const validateAdminGetVagas = (req: Request, res: Response, next: NextFunction) => {
+	try {
+		if(!req.body.authenticatedUser.isAdmin) throw new AdminRequiredError();
+
+		next();
+	} catch (error: any) {
+		handleError(error, res);
+	}
 };
 
 export const validateCreateVaga = async (req: Request, res: Response, next: NextFunction) => {
