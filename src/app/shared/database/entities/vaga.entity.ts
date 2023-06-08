@@ -40,6 +40,7 @@ export class VagaEntity extends BaseEntity {
 		return {
 			id: this.uuid,
 			criadaEm: this.criadoEm,
+			descricao: this.descricao,
 			dataLimite: this.dataLimite,
 			maxCandidatos: this.maxCandidatos,
 			nomeEmpresa: this.nomeEmpresa,

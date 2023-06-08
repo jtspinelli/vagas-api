@@ -5,6 +5,10 @@ import { VagaEntity } from '../../shared/database/entities/vaga.entity';
 import { appEnv } from '../../env/appEnv';
 import { VagaDTO } from './usecases/getVagasUsecase/VagaDTO';
 import { Page } from '../../helpers/Page';
+import { UserEntity } from '../../shared/database/entities/user.entity';
+import { UserDTO } from '../user/usecases/getUsers/UserDTO';
+import { VagaComCandidatosDTO } from './usecases/getVagasUsecase/VagaComCandidatosDTO';
+import mapper from '../../helpers/mapper';
 
 export class VagaRepository {
 	private vagaRepository: Repository<VagaEntity>;
@@ -40,6 +44,32 @@ export class VagaRepository {
 		return new Page<VagaDTO>(
 			page, totalPages, count, vagas
 		);
+	}
+
+	async getVagasFromRecrutador(queryParams: any, recrutadorUuid: string) {
+		const page = Number(queryParams.page) || 1;
+		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+
+		const query = this.vagaRepository
+			.createQueryBuilder('vaga')
+			.leftJoinAndSelect('vaga.candidaturas', 'candidaturas')
+			.leftJoinAndSelect('candidaturas.candidato', 'candidaturaCandidato')
+			.orderBy('vaga.criadoEm', 'DESC')
+			.where('vaga.recrutadorUuid = :recrutadorUuid', {recrutadorUuid});
+		
+		query.skip(page * limit - limit);
+		query.take(limit);
+
+		const totalPages = Math.ceil(await query.getCount() / limit);
+		const count = await query.getCount();
+		const vagas: VagaComCandidatosDTO[] = (await query.getMany()).map(vaga => {
+			return {
+				...vaga.toJson(),
+				candidatos: vaga.candidaturas.map(c => mapper.map(c.candidato, UserEntity, UserDTO))
+			};
+		});
+
+		return new Page<VagaComCandidatosDTO>(page, totalPages, count, vagas);
 	}
 
 	async create(vagaToCreate: VagaEntity) {		

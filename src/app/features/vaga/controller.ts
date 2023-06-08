@@ -18,8 +18,8 @@ export const listVagasController = async (req: Request, res: Response) => {
 		const vagas = await getVagasUsecase.execute(req.body.authenticatedUser, req.query);
 
 		res.status(200).send(vagas);
-	} catch (error) {
-		res.status(500).send({message: 'Ocorreu um erro.'});
+	} catch (error: any) {
+		handleError(error, res);
 	}
 };
 
