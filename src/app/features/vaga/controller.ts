@@ -10,7 +10,6 @@ import { VagaEntity } from '../../shared/database/entities/vaga.entity';
 import { DeleteVagaUsecase } from './usecases/deleteVagaUsecase/deleteVagaUsecase';
 import { GetVagasSemCandidaturasUsecase } from './usecases/getVagasUsecase/getVagasSemCandidaturasUsecase';
 import { GetVagasFullCandidaturasUsecase } from './usecases/getVagasUsecase/getVagasFullCandidaturasUsecase';
-import db from '../../../main/config/dataSource';
 
 export const listVagasController = async (req: Request, res: Response) => {
 	try {
