@@ -133,16 +133,17 @@ export class VagaRepository {
 		return await this.getPagedList(req, false, true);
 	}
 
-	async getVagasFromRecrutador(queryParams: any, recrutadorUuid: string) {
-		const page = Number(queryParams.page) || 1;
-		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+	async getVagasFromRecrutador(req: Request) {
+		const page = Number(req.query.page) || 1;
+		const limit = Number(req.query.limit || appEnv.paginationLimit);
+		const authenticatedUser: IAuthenticatedUser = req.body.authenticatedUser;
 
 		const query = this.vagaRepository
 			.createQueryBuilder('vaga')
 			.leftJoinAndSelect('vaga.candidaturas', 'candidaturas')
 			.leftJoinAndSelect('candidaturas.candidato', 'candidaturaCandidato')
 			.orderBy('vaga.criadoEm', 'DESC')
-			.where('vaga.recrutadorUuid = :recrutadorUuid', {recrutadorUuid});
+			.where('vaga.recrutadorUuid = :recrutadorUuid', {recrutadorUuid: authenticatedUser.sub});
 		
 		query.skip(page * limit - limit);
 		query.take(limit);

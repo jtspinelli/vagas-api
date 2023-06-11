@@ -29,7 +29,7 @@ export class GetVagasUsecase {
 		const authenticatedUser: IAuthenticatedUser = req.body.authenticatedUser;
 
 		if(authenticatedUser.isRecrutador) {
-			return await this.vagaRepository.getVagasFromRecrutador(req.query, authenticatedUser.sub);
+			return await this.vagaRepository.getVagasFromRecrutador(req);
 		}
 		
 		const vagas = await this.vagaRepository.getPagedList(req);
