@@ -24,4 +24,8 @@ export class CacheRedisRepository {
 	async invalidate(key: string) {
 		this.redisConn.del(key);
 	}
+
+	async getKeysStartingWith(value: string) {
+		return this.redisConn.keys(`${value}*`);
+	}
 }
