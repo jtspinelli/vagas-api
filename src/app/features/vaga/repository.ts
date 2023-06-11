@@ -160,11 +160,8 @@ export class VagaRepository {
 		return new Page<VagaComCandidatosDTO>(page, totalPages, count, vagas);
 	}
 
-	async invalidateGetVagasCachedQueries(){
-		const cachedKeys = await this.cacheRedisRepository.getKeysStartingWith('getvagas');
-		cachedKeys.forEach(async (key) => {
-			await this.cacheRedisRepository.invalidate(key);
-		});
+	async invalidateGetVagasCachedQueries() {
+		await this.cacheRedisRepository.invalidateGetVagasCachedQueries();
 	}
 
 	async create(vagaToCreate: VagaEntity) {	
@@ -175,5 +172,11 @@ export class VagaRepository {
 	async remove(vaga: VagaEntity) {
 		this.invalidateGetVagasCachedQueries();
 		return await this.vagaRepository.remove(vaga);
+	}
+
+	async updateAtiva(vaga: VagaEntity, value: boolean) {
+		vaga.ativa = value;
+		await this.vagaRepository.save(vaga);
+		this.invalidateGetVagasCachedQueries();
 	}
 }

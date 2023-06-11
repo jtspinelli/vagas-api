@@ -7,14 +7,17 @@ import { VagaDTO } from '../vaga/usecases/getVagasUsecase/VagaDTO';
 import { VagaComCandidatosDTO } from '../vaga/usecases/getVagasUsecase/VagaComCandidatosDTO';
 import { UserEntity } from '../../shared/database/entities/user.entity';
 import { UserDTO } from '../user/usecases/getUsers/UserDTO';
+import { CacheRedisRepository } from '../cache/repository';
 import db from '../../../main/config/dataSource';
 import mapper from '../../helpers/mapper';
+import redisConn from '../../../main/config/redis';
 
 export class CandidaturaRepository {
 	private candidaturaRepository: Repository<CandidaturaEntity>;
-
+	private cacheRedisRepository: CacheRedisRepository;
 	constructor() {
 		this.candidaturaRepository = db.getRepository(CandidaturaEntity);
+		this.cacheRedisRepository = new CacheRedisRepository(redisConn);
 	}
 
 	async getAll() {
@@ -139,11 +142,17 @@ export class CandidaturaRepository {
 		);
 	}
 
+	async invalidateGetVagasCachedQueries() {
+		this.cacheRedisRepository.invalidateGetVagasCachedQueries();
+	}
+
 	async save(candidatura: CandidaturaEntity) {
+		this.invalidateGetVagasCachedQueries();
 		return await this.candidaturaRepository.save(candidatura);
 	}
 
 	async remove(candidatura: CandidaturaEntity) {
+		this.invalidateGetVagasCachedQueries();
 		return await this.candidaturaRepository.remove(candidatura);
 	}
 }

@@ -28,4 +28,11 @@ export class CacheRedisRepository {
 	async getKeysStartingWith(value: string) {
 		return this.redisConn.keys(`${value}*`);
 	}
+
+	async invalidateGetVagasCachedQueries(){
+		const cachedKeys = await this.getKeysStartingWith('getvagas');
+		cachedKeys.forEach(async (key) => {
+			await this.invalidate(key);
+		});
+	}
 }
