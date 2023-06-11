@@ -9,23 +9,56 @@ import { Page } from '../../helpers/Page';
 import { UserEntity } from '../../shared/database/entities/user.entity';
 import { UserDTO } from '../user/usecases/getUsers/UserDTO';
 import { VagaComCandidatosDTO } from './usecases/getVagasUsecase/VagaComCandidatosDTO';
+import { CacheRedisRepository } from '../cache/repository';
+import { IAuthenticatedUser } from '../../shared/middlewares/IAuthenticatedUser';
+import { Request } from 'express';
 import mapper from '../../helpers/mapper';
+import redisConn from '../../../main/config/redis';
 
 export class VagaRepository {
 	private vagaRepository: Repository<VagaEntity>;
+	private cacheRedisRepository: CacheRedisRepository;
 
 	constructor() {
 		this.vagaRepository = db.getRepository(VagaEntity);
+		this.cacheRedisRepository = new CacheRedisRepository(redisConn);
+	}
+
+	resolveCacheKey(req: Request) {
+		const { limit, page, descricao, criadoEm, recrutadorId, ativa } = req.query;
+		const userTipo = req.body.authenticatedUser.isAdmin
+			? ':userIs=Admin'
+			: req.body.authenticatedUser.isRecrutador
+				? ':userIs=Recrutador'
+				: ':userIs=Candidato';
+
+		let key = `getvagas${userTipo}:`;
+
+		if(limit) key += `limit=${limit}&`;
+		if(page) key += `page=${page}&`;
+		if(descricao) key += `&descricao=${descricao}&`;
+		if(criadoEm) key += `&criadoEm=${criadoEm}&`;
+		if(recrutadorId) key += `&recrutadorId=${recrutadorId}&`;
+		if(ativa) key += `&ativa=${ativa}&`;
+
+		if(key.endsWith('&')) key = key.substring(0,key.length - 1);
+
+		return key;
 	}
 
 	async get(uuid: string) {
 		return this.vagaRepository.findOneBy({uuid});
-	}
+	}	
 
-	async getPagedList(queryParams: any, isAdmin: boolean, filterSemCandidaturas: boolean = false, filterFullCandidaturas: boolean = false): Promise<Page<VagaDTO>> {
-		const { descricao, criadoEm, recrutadorId, ativa } = queryParams;
-		const page = Number(queryParams.page) || 1;
-		const limit = Number(queryParams.limit || appEnv.paginationLimit);
+	async getPagedList(req: Request, filterSemCandidaturas: boolean = false, filterFullCandidaturas: boolean = false): Promise<Page<VagaDTO>> {
+		const resolvedKey = this.resolveCacheKey(req);
+		const cachedQuery = await this.cacheRedisRepository.get(resolvedKey);
+		if(cachedQuery) return cachedQuery;
+		
+		const { descricao, criadoEm, recrutadorId, ativa } = req.query;
+		const page = Number(req.query.page) || 1;
+		const limit = Number(req.query.limit || appEnv.paginationLimit);
+		const authenticatedUser: IAuthenticatedUser = req.body.authenticatedUser;
 
 		const query = this.vagaRepository
 			.createQueryBuilder('vagaEntity')
@@ -36,19 +69,19 @@ export class VagaRepository {
 			query.where('lower(vagaEntity.descricao) like :descricao', {descricao: `%${descricao}%`});
 		}
 
-		if(isAdmin && criadoEm) {
+		if(authenticatedUser.isAdmin && criadoEm) {
 			query.where('vagaEntity.criadoEm <= :criadoEm', {criadoEm});
 		}
 
-		if(isAdmin && recrutadorId) {
+		if(authenticatedUser.isAdmin && recrutadorId) {
 			query.where('vagaEntity.recrutador_uuid = :recrutadorId', {recrutadorId});
 		}
 
-		if(isAdmin && ativa) {
+		if(authenticatedUser.isAdmin && ativa) {
 			query.where('vagaEntity.ativa = :ativa', {ativa});
 		}
 
-		if(isAdmin && filterSemCandidaturas) {
+		if(authenticatedUser.isAdmin && filterSemCandidaturas) {
 			query.where(qb => {	
 				const subQuery = qb
 					.subQuery()
@@ -62,7 +95,7 @@ export class VagaRepository {
 			query.loadRelationCountAndMap('vagaEntity.candidaturasCount', 'vagaEntity.candidaturas');
 		}
 
-		if(isAdmin && filterFullCandidaturas) {
+		if(authenticatedUser.isAdmin && filterFullCandidaturas) {
 			query.where(qb => {
 				const subQuery = qb
 					.subQuery()
@@ -83,18 +116,21 @@ export class VagaRepository {
 		const totalPages = Math.ceil(await query.getCount() / limit);
 		const count = await query.getCount();
 		const vagas = (await query.getMany()).map(vaga =>vaga.toJson());
-
-		return new Page<VagaDTO>(
+		const pagedList = new Page<VagaDTO>(
 			page, totalPages, count, vagas
 		);
+
+		this.cacheRedisRepository.set(resolvedKey, pagedList);
+
+		return pagedList;
 	}
 
-	async getVagasSemCandidaturas(queryParams: any) {
-		return await this.getPagedList(queryParams, true, true);
+	async getVagasSemCandidaturas(req: Request) {
+		return await this.getPagedList(req, true, false);
 	}
 
-	async getVagasFullCandidaturas(queryParams: any) {
-		return await this.getPagedList(queryParams, true, false, true);
+	async getVagasFullCandidaturas(req: Request) {
+		return await this.getPagedList(req, false, true);
 	}
 
 	async getVagasFromRecrutador(queryParams: any, recrutadorUuid: string) {

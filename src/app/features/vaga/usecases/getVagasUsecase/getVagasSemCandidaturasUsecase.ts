@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Request } from 'express';
 import { VagaRepository } from '../../repository';
 
 export class GetVagasSemCandidaturasUsecase {
@@ -8,8 +9,8 @@ export class GetVagasSemCandidaturasUsecase {
 		this.vagaRepository = vagaRepository;
 	}
 
-	async execute(queryParams: any) {
-		const vagas = await this.vagaRepository.getVagasSemCandidaturas(queryParams);
+	async execute(req: Request) {
+		const vagas = await this.vagaRepository.getVagasSemCandidaturas(req);
 		return vagas;
 	}
 }

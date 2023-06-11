@@ -17,7 +17,7 @@ export const listVagasController = async (req: Request, res: Response) => {
 		const vagaRepository = new VagaRepository();
 		const candidaturaRepository = new CandidaturaRepository();
 		const getVagasUsecase = new GetVagasUsecase(vagaRepository, candidaturaRepository);		
-		const vagas = await getVagasUsecase.execute(req.body.authenticatedUser, req.query);
+		const vagas = await getVagasUsecase.execute(req);
 
 		res.status(200).send(vagas);
 	} catch (error: any) {
@@ -30,7 +30,7 @@ export const getVagasSemCandidaturasController = async (req: Request, res: Respo
 		const vagaRepository = new VagaRepository();
 		const getVagasSemCandidaturasUsecase = new GetVagasSemCandidaturasUsecase(vagaRepository);
 
-		res.send(await getVagasSemCandidaturasUsecase.execute(req.query));
+		res.send(await getVagasSemCandidaturasUsecase.execute(req));
 	} catch (error: any) {
 		handleError(error, res);
 	}
@@ -41,7 +41,7 @@ export const getVagasFullCandidaturasController = async (req: Request, res: Resp
 		const vagaRepository = new VagaRepository();
 		const getVagasFullCandidaturasUsecase = new GetVagasFullCandidaturasUsecase(vagaRepository);
 		
-		res.send(await getVagasFullCandidaturasUsecase.execute(req.query));
+		res.send(await getVagasFullCandidaturasUsecase.execute(req));
 	} catch (error: any) {
 		handleError(error, res);
 	}
