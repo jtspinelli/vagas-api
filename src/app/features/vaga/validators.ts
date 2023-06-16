@@ -9,9 +9,9 @@ import { VagaNotFoundError } from '../../shared/exceptions/VagaNotFoundError';
 import { VagaAlreadyDeactivatedError } from '../../shared/exceptions/VagaAlreadyDeactivatedError';
 import { VagaAlreadyActiveError } from '../../shared/exceptions/VagaAlreadyActiveError';
 import { VagaActivationForbiddenError } from '../../shared/exceptions/VagaActivationForbiddenError';
-import db from '../../../main/config/dataSource';
 import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
 import { AdminRequiredError } from '../../shared/exceptions/AdminRequiredError';
+import db from '../../../main/config/dataSource';
 
 export const checkGetVagasQueryParams = (req: Request, res: Response, next: NextFunction) => {
 	if(req.query.limit && (isNaN(Number(req.query.limit)) || Number(req.query.limit) > 10)){
@@ -23,6 +23,17 @@ export const checkGetVagasQueryParams = (req: Request, res: Response, next: Next
 	}
 
 	next();
+};
+
+export const validateGetVagaById = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const vaga = await db.getRepository(VagaEntity).findOneBy({uuid: req.params.id});
+		if(!vaga) throw new VagaNotFoundError();
+	
+		next();
+	} catch (error: any) {
+		handleError(error, res);
+	}
 };
 
 export const validateAdminGetVagas = (req: Request, res: Response, next: NextFunction) => {

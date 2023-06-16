@@ -10,6 +10,7 @@ import { VagaEntity } from '../../shared/database/entities/vaga.entity';
 import { DeleteVagaUsecase } from './usecases/deleteVagaUsecase/deleteVagaUsecase';
 import { GetVagasSemCandidaturasUsecase } from './usecases/getVagasUsecase/getVagasSemCandidaturasUsecase';
 import { GetVagasFullCandidaturasUsecase } from './usecases/getVagasUsecase/getVagasFullCandidaturasUsecase';
+import { GetVagaByIdUsecase } from './usecases/getVagasUsecase/getVagaByIdUsecase';
 
 export const listVagasController = async (req: Request, res: Response) => {
 	try {
@@ -22,6 +23,14 @@ export const listVagasController = async (req: Request, res: Response) => {
 	} catch (error: any) {
 		handleError(error, res);
 	}
+};
+
+export const getVagaByIdController = async (req: Request, res: Response) => {
+	const vagaRepository = new VagaRepository();
+	const getVagaByIdUsecase = new GetVagaByIdUsecase(vagaRepository);
+	const vaga = await getVagaByIdUsecase.execute(req.params.id);
+
+	return res.send(vaga);
 };
 
 export const getVagasSemCandidaturasController = async (req: Request, res: Response) => {
