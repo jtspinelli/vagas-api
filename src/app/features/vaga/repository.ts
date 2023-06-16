@@ -13,7 +13,7 @@ import { CacheRedisRepository } from '../cache/repository';
 import { IAuthenticatedUser } from '../../shared/middlewares/IAuthenticatedUser';
 import { Request } from 'express';
 import mapper from '../../helpers/mapper';
-import redisConn from '../../../main/config/redis';
+// import redisConn from '../../../main/config/redis';
 
 export class VagaRepository {
 	private vagaRepository: Repository<VagaEntity>;
@@ -21,7 +21,7 @@ export class VagaRepository {
 
 	constructor() {
 		this.vagaRepository = db.getRepository(VagaEntity);
-		this.cacheRedisRepository = new CacheRedisRepository(redisConn);
+		this.cacheRedisRepository = new CacheRedisRepository();
 	}
 
 	resolveCacheKey(req: Request) {

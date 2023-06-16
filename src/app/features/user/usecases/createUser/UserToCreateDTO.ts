@@ -11,7 +11,7 @@ export class UserToCreateDTO {
 	public senha: string;
 
 	@AutoMap()
-	public nomeEmpresa: string;
+	public nomeEmpresa: string | undefined;
 
 	@AutoMap()
 	public tipo: 'Candidato' | 'Admin' | 'Recrutador';

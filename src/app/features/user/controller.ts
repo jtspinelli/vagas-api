@@ -6,6 +6,7 @@ import { ForbiddenError } from '../../shared/exceptions/ForbiddenError';
 import { UserRepository } from './repository';
 import { CandidaturaRepository } from '../candidatura/repository';
 import { GetVagasAplicadasUsecase } from './usecases/getVagasAplicadas/getVagasAplicadasUseCase';
+import { appEnv } from '../../env/appEnv';
 
 export const createUserController = async (req: Request, res: Response) => {
 	try {
@@ -29,7 +30,11 @@ export const getUsersController = async (req: Request, res: Response) => {
 	const getUsersUsecase = new GetUsersUsecase(userRepository);
 	
 	try {
-		const users = await getUsersUsecase.execute(req);
+		const { name, tipo } = req.query;
+		const page = Number(req.query.page) || 1;
+		const limit = Number(req.query.limit || appEnv.paginationLimit);
+		const users = await getUsersUsecase.execute(page, limit, name as string | undefined, tipo as string | undefined, req.body.authenticatedUser);
+		
 		return res.status(200).send(users);
 	} catch(error: any) {
 		return res.status(500).send({});

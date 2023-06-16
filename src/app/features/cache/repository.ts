@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Redis } from 'ioredis';
+import { RedisConnection } from '../../../main/config/RedisConnection';
 
 export class CacheRedisRepository {
-	constructor(private redisConn: Redis){}
+	private redisConn: Redis;
+	
+	constructor() {
+		this.redisConn = RedisConnection.getConnection();
+	}
 
 	async set(key: string, value: Object | string) {
 		const valueToStore = typeof value === 'object' 

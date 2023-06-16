@@ -10,14 +10,13 @@ import { UserDTO } from '../user/usecases/getUsers/UserDTO';
 import { CacheRedisRepository } from '../cache/repository';
 import db from '../../../main/config/dataSource';
 import mapper from '../../helpers/mapper';
-import redisConn from '../../../main/config/redis';
 
 export class CandidaturaRepository {
 	private candidaturaRepository: Repository<CandidaturaEntity>;
 	private cacheRedisRepository: CacheRedisRepository;
 	constructor() {
 		this.candidaturaRepository = db.getRepository(CandidaturaEntity);
-		this.cacheRedisRepository = new CacheRedisRepository(redisConn);
+		this.cacheRedisRepository = new CacheRedisRepository();
 	}
 
 	async getAll() {
