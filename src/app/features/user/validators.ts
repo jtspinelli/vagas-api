@@ -25,7 +25,7 @@ export const checkGetUsersQueryParams = (req: Request, res: Response, next: Next
 		return res.status(400).send('Propriedade limit inválida.');
 	}
 
-	if(req.query.page && isNaN(Number(req.query.page))){
+	if(req.query.page && (isNaN(Number(req.query.page)) || Number(req.query.page) < 0)){
 		return res.status(400).send('Propriedade page inválida.');
 	}
 
