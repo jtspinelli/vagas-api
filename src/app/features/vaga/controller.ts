@@ -75,8 +75,9 @@ export const getCandidatosController = async (req: Request, res: Response) => {
 	return res.status(200).send(await getCandidatosUsecase.execute(req.query, req.params.id, req.body.authenticatedUser.sub));
 };
 
-const updateAtiva = async (res: Response, vaga: VagaEntity, value: boolean) => {
+const updateAtiva = async (res: Response, vaga: VagaEntity, value: boolean) => {	
 	const vagaRepository = new VagaRepository();
+	vagaRepository.invalidate(`getvaga:${vaga.uuid}`);
 	await vagaRepository.updateAtiva(vaga, value);
 
 	return res.status(204).send({});

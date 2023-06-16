@@ -13,7 +13,6 @@ import { CacheRedisRepository } from '../cache/repository';
 import { IAuthenticatedUser } from '../../shared/middlewares/IAuthenticatedUser';
 import { Request } from 'express';
 import mapper from '../../helpers/mapper';
-// import redisConn from '../../../main/config/redis';
 
 export class VagaRepository {
 	private vagaRepository: Repository<VagaEntity>;
@@ -47,7 +46,15 @@ export class VagaRepository {
 	}
 
 	async get(uuid: string) {
-		return this.vagaRepository.findOneBy({uuid});
+		const cacheKey = `getvaga:${uuid}`;
+		const cachedQuery = await this.cacheRedisRepository.get(cacheKey);
+		if(cachedQuery) return cachedQuery;
+
+		const vaga = await this.vagaRepository.findOneBy({uuid});
+
+		this.cacheRedisRepository.set(cacheKey, vaga as VagaEntity);
+
+		return vaga;
 	}	
 
 	async getPagedList(req: Request, filterSemCandidaturas: boolean = false, filterFullCandidaturas: boolean = false): Promise<Page<VagaDTO>> {
@@ -178,5 +185,9 @@ export class VagaRepository {
 		vaga.ativa = value;
 		await this.vagaRepository.save(vaga);
 		this.invalidateGetVagasCachedQueries();
+	}
+
+	invalidate(key: string) {
+		this.cacheRedisRepository.invalidate(key);
 	}
 }
